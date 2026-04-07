@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { format, differenceInDays } from 'date-fns';
+import { format } from 'date-fns';
 import { Trash2 } from 'lucide-react';
 import type { DateRange, Note, NoteColor, MonthTheme } from '@/lib/types';
 
@@ -24,6 +24,7 @@ interface NotesPanelProps {
   onClearSelection: () => void;
   theme: MonthTheme;
   darkMode: boolean;
+  isMobile?: boolean;
 }
 
 export default function NotesPanel({
@@ -33,11 +34,12 @@ export default function NotesPanel({
   onClearSelection,
   theme,
   darkMode,
+  isMobile = false,
 }: NotesPanelProps) {
   const [activeLine, setActiveLine] = useState<number | null>(null);
-  const [lineTexts, setLineTexts] = useState<string[]>(Array(LINE_COUNT).fill(''));
-  const [color, setColor] = useState<NoteColor>('yellow');
-  const [saved, setSaved] = useState(false);
+  const [lineTexts,  setLineTexts]  = useState<string[]>(Array(LINE_COUNT).fill(''));
+  const [color,      setColor]      = useState<NoteColor>('yellow');
+  const [saved,      setSaved]      = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const hasStart = !!selectedRange.start;
@@ -55,7 +57,7 @@ export default function NotesPanel({
     const newNote: Note = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
       rangeStart: selectedRange.start.toISOString(),
-      rangeEnd: (selectedRange.end ?? selectedRange.start).toISOString(),
+      rangeEnd:   (selectedRange.end ?? selectedRange.start).toISOString(),
       content,
       color,
       createdAt: new Date().toISOString(),
@@ -70,23 +72,149 @@ export default function NotesPanel({
 
   const handleDelete = (id: string) => onSaveNotes(notes.filter(n => n.id !== id));
 
-  const bg = darkMode ? 'bg-zinc-900' : 'bg-white';
-  const border = darkMode ? 'border-zinc-800' : 'border-zinc-100';
-  const headingColor = darkMode ? 'text-zinc-400' : 'text-zinc-500';
-  const lineColor = darkMode ? '#3f3f46' : '#e5e7eb';
-  const inputText = darkMode ? 'text-zinc-300 placeholder-zinc-600' : 'text-zinc-700 placeholder-zinc-300';
+  const bg       = darkMode ? 'bg-zinc-900' : 'bg-white';
+  const border   = darkMode ? 'border-zinc-800' : 'border-zinc-100';
+  const heading  = darkMode ? 'text-zinc-400' : 'text-zinc-500';
+  const lineClr  = darkMode ? '#3f3f46' : '#e5e7eb';
+  const inputTxt = darkMode ? 'text-zinc-300 placeholder-zinc-600' : 'text-zinc-700 placeholder-zinc-300';
 
+  if (isMobile) {
+    /* ── Mobile layout: full-width, taller textarea feel ── */
+    return (
+      <div className={`flex flex-col ${bg} transition-colors duration-300 min-h-[420px]`}>
+        <div className="p-4 flex flex-col gap-3 flex-1">
+
+          <div className="flex items-center justify-between">
+            <p className={`text-[9px] font-black tracking-[0.3em] uppercase ${heading}`}>Notes</p>
+            {hasStart && (
+              <span className="text-[10px] font-semibold" style={{ color: theme.primaryColor }}>
+                {rangeLabel}
+              </span>
+            )}
+          </div>
+
+          {/* Lined notepad — larger touch targets on mobile */}
+          <div className="flex flex-col gap-0 flex-1">
+            {Array.from({ length: LINE_COUNT }).map((_, i) => (
+              <div key={i} className="relative group">
+                <input
+                  ref={el => { inputRefs.current[i] = el; }}
+                  value={lineTexts[i]}
+                  onChange={e => {
+                    const next = [...lineTexts];
+                    next[i] = e.target.value;
+                    setLineTexts(next);
+                  }}
+                  onFocus={() => setActiveLine(i)}
+                  onBlur={() => setActiveLine(null)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && i < LINE_COUNT - 1) inputRefs.current[i + 1]?.focus();
+                  }}
+                  placeholder="tap to write..."
+                  maxLength={60}
+                  className={`w-full bg-transparent text-sm py-3 px-0 focus:outline-none transition-colors font-handwriting ${inputTxt}`}
+                  style={{ fontFamily: "'Patrick Hand', 'Caveat', cursive" }}
+                />
+                <div
+                  className="absolute bottom-0 left-0 right-0 h-[1px] transition-colors"
+                  style={{
+                    backgroundColor: activeLine === i ? theme.primaryColor : lineClr,
+                    opacity: activeLine === i ? 0.9 : 1,
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Colour swatches */}
+          <div className="flex items-center gap-2 flex-wrap pt-1">
+            {NOTE_COLORS.map(c => (
+              <button
+                key={c.value}
+                onClick={() => setColor(c.value)}
+                title={c.value}
+                className="w-5 h-5 rounded-full transition-transform touch-manipulation"
+                style={{
+                  backgroundColor: c.dot,
+                  transform: color === c.value ? 'scale(1.45)' : 'scale(1)',
+                  boxShadow: color === c.value ? `0 0 0 2px white, 0 0 0 3.5px ${c.dot}` : 'none',
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Save */}
+          {hasStart && (
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              onClick={handleSave}
+              disabled={!lineTexts.some(Boolean)}
+              className="w-full py-3 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-35 disabled:cursor-not-allowed touch-manipulation"
+              style={{ backgroundColor: theme.primaryColor }}
+            >
+              {saved ? '✓ Saved!' : 'Save Note'}
+            </motion.button>
+          )}
+
+          {!hasStart && (
+            <p className={`text-center text-xs ${heading} py-4`}>
+              Tap a date on the calendar to attach a note
+            </p>
+          )}
+        </div>
+
+        {/* Saved notes */}
+        {notes.length > 0 && (
+          <div className={`border-t ${border} p-4 flex flex-col gap-2`}>
+            <p className={`text-[9px] font-black tracking-[0.3em] uppercase ${heading}`}>Saved ({notes.length})</p>
+            <div className="flex flex-col gap-2 max-h-48 overflow-y-auto scrollbar-thin">
+              <AnimatePresence initial={false}>
+                {[...notes].reverse().map(note => {
+                  const c = NOTE_COLORS.find(x => x.value === note.color) ?? NOTE_COLORS[0];
+                  return (
+                    <motion.div
+                      key={note.id}
+                      layout
+                      initial={{ opacity: 0, x: 14 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -14, height: 0 }}
+                      className="rounded-xl p-3 relative flex-shrink-0"
+                      style={{ backgroundColor: darkMode ? c.bgDark : c.bg, borderLeft: `3px solid ${c.dot}` }}
+                    >
+                      <p className="text-[10px] font-bold truncate pr-7" style={{ color: c.dot }}>{note.title}</p>
+                      <p className={`text-[10px] mt-0.5 line-clamp-2 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                        {note.content}
+                      </p>
+                      {/* Always visible delete on mobile */}
+                      <button
+                        onClick={() => handleDelete(note.id)}
+                        className="absolute top-2 right-2 p-1 rounded-full text-red-400 hover:text-red-500 hover:bg-red-50 transition-colors touch-manipulation"
+                        aria-label="Delete"
+                      >
+                        <Trash2 size={12}/>
+                      </button>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  /* ── Desktop layout (fixed narrow sidebar) ── */
   return (
-    <div className={`flex flex-col ${bg} border-r ${border} transition-colors duration-300`}
-         style={{ width: 185, minWidth: 185, flexShrink: 0 }}>
+    <div
+      className={`flex flex-col ${bg} border-r ${border} transition-colors duration-300`}
+      style={{ width: 185, minWidth: 185, flexShrink: 0 }}
+    >
       <div className="p-4 flex flex-col gap-3 flex-1">
 
-        {/* ── "NOTES" heading ── */}
-        <p className={`text-[9px] font-black tracking-[0.3em] uppercase ${headingColor}`}>
-          Notes
-        </p>
+        <p className={`text-[9px] font-black tracking-[0.3em] uppercase ${heading}`}>Notes</p>
 
-        {/* ── Range label (if selection) ── */}
         <AnimatePresence>
           {hasStart && (
             <motion.div
@@ -102,7 +230,7 @@ export default function NotesPanel({
           )}
         </AnimatePresence>
 
-        {/* ── Lined notepad ── */}
+        {/* Lined notepad */}
         <div className="flex flex-col gap-0 flex-1">
           {Array.from({ length: LINE_COUNT }).map((_, i) => (
             <div key={i} className="relative group">
@@ -117,20 +245,17 @@ export default function NotesPanel({
                 onFocus={() => setActiveLine(i)}
                 onBlur={() => setActiveLine(null)}
                 onKeyDown={e => {
-                  if (e.key === 'Enter' && i < LINE_COUNT - 1) {
-                    inputRefs.current[i + 1]?.focus();
-                  }
+                  if (e.key === 'Enter' && i < LINE_COUNT - 1) inputRefs.current[i + 1]?.focus();
                 }}
                 placeholder="tap to write..."
                 maxLength={40}
-                className={`w-full bg-transparent text-[11px] py-2 px-0 focus:outline-none transition-colors font-handwriting ${inputText}`}
+                className={`w-full bg-transparent text-[11px] py-2 px-0 focus:outline-none transition-colors font-handwriting ${inputTxt}`}
                 style={{ fontFamily: "'Patrick Hand', 'Caveat', cursive" }}
               />
-              {/* Ruled line */}
               <div
                 className="absolute bottom-0 left-0 right-0 h-[1px] transition-colors"
                 style={{
-                  backgroundColor: activeLine === i ? theme.primaryColor : lineColor,
+                  backgroundColor: activeLine === i ? theme.primaryColor : lineClr,
                   opacity: activeLine === i ? 0.8 : 1,
                 }}
               />
@@ -138,7 +263,7 @@ export default function NotesPanel({
           ))}
         </div>
 
-        {/* ── Colour swatches + save ── */}
+        {/* Colour swatches */}
         <div className="flex items-center gap-1.5 flex-wrap">
           {NOTE_COLORS.map(c => (
             <button
@@ -155,16 +280,14 @@ export default function NotesPanel({
           ))}
         </div>
 
-        {/* ── Save button ── */}
+        {/* Save */}
         {hasStart && (
           <motion.button
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             onClick={handleSave}
             disabled={!lineTexts.some(Boolean)}
-            className="w-full py-1.5 rounded-lg text-[11px] font-bold text-white transition-all
-                       hover:opacity-90 hover:scale-[1.02] active:scale-[0.98]
-                       disabled:opacity-35 disabled:cursor-not-allowed"
+            className="w-full py-1.5 rounded-lg text-[11px] font-bold text-white transition-all hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-35 disabled:cursor-not-allowed"
             style={{ backgroundColor: theme.primaryColor }}
           >
             {saved ? '✓ Saved!' : 'Save Note'}
@@ -172,10 +295,10 @@ export default function NotesPanel({
         )}
       </div>
 
-      {/* ── Saved notes (scrollable mini cards) ── */}
+      {/* Saved notes (scrollable) */}
       {notes.length > 0 && (
         <div className={`border-t ${border} p-3 max-h-36 overflow-y-auto scrollbar-thin flex flex-col gap-2`}>
-          <p className={`text-[8px] font-black tracking-[0.3em] uppercase ${headingColor}`}>Saved</p>
+          <p className={`text-[8px] font-black tracking-[0.3em] uppercase ${heading}`}>Saved</p>
           <AnimatePresence initial={false}>
             {[...notes].reverse().map(note => {
               const c = NOTE_COLORS.find(x => x.value === note.color) ?? NOTE_COLORS[0];

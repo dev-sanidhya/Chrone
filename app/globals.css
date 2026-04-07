@@ -107,3 +107,23 @@ button:focus-visible {
   animation: auroraShimmer 6s ease-in-out infinite;
   transform-origin: center;
 }
+
+/* ─── Confetti fall ──────────────────────────────────────────── */
+@keyframes confettiFall {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) translateX(var(--drift, 0px)) rotate(720deg) scale(0.6);
+    opacity: 0;
+  }
+}
+
+.confetti-piece {
+  animation: confettiFall ease-in forwards;
+  will-change: transform, opacity;
+}

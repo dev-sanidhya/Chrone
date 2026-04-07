@@ -13,62 +13,55 @@ interface DayCellProps {
   isInRange: boolean;
   isRangePreview: boolean;
   holiday?: Holiday;
+  sticker?: string;
   theme: MonthTheme;
   darkMode: boolean;
   onClick: () => void;
+  onDoubleClick: () => void;
   onHover: () => void;
   onLeave: () => void;
 }
 
 export default function DayCell({
-  date,
-  currentMonth,
-  isToday,
-  isStart,
-  isEnd,
-  isInRange,
-  isRangePreview,
-  holiday,
-  theme,
-  darkMode,
-  onClick,
-  onHover,
-  onLeave,
+  date, currentMonth, isToday, isStart, isEnd,
+  isInRange, isRangePreview, holiday, sticker,
+  theme, darkMode, onClick, onDoubleClick, onHover, onLeave,
 }: DayCellProps) {
   const isCurrentMonth = date.getMonth() === currentMonth;
-  const day = format(date, 'd');
+  const day      = format(date, 'd');
   const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-  const isEdge = isStart || isEnd;
-  const hasRange = isInRange || isRangePreview;
+  const isEdge    = isStart || isEnd;
+  const hasRange  = isInRange || isRangePreview;
+  const moon      = getMoonPhase(date);
 
-  // Moon phase — only show significant ones
-  const moon = getMoonPhase(date);
-
-  // Connector halves for range highlight
   const leftConn  = (hasRange || isEnd)   && !isStart;
   const rightConn = (hasRange || isStart) && !isEnd;
-  const connBg = isRangePreview ? `${theme.primaryColor}15` : `${theme.primaryColor}22`;
+  const connBg    = isRangePreview ? `${theme.primaryColor}14` : `${theme.primaryColor}24`;
 
   return (
     <div
       className="relative flex items-center justify-center"
-      style={{ height: 36 }}
+      style={{ height: 38 }}
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
+      onTouchStart={onHover}
     >
+      {/* Range connector halves */}
       {leftConn  && <div className="absolute left-0  top-1/2 -translate-y-1/2 w-1/2 h-7 pointer-events-none" style={{ backgroundColor: connBg }}/>}
       {rightConn && <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-7 pointer-events-none" style={{ backgroundColor: connBg }}/>}
 
       <button
         onClick={onClick}
+        onDoubleClick={e => { e.preventDefault(); onDoubleClick(); }}
         title={[
           format(date, 'EEEE, MMMM d'),
           holiday ? `${holiday.emoji} ${holiday.name}` : '',
           moon.show ? moon.name : '',
+          sticker ? 'Has sticker' : '',
         ].filter(Boolean).join(' · ')}
         className={[
           'relative z-10 flex flex-col items-center justify-center',
-          'w-8 h-8 rounded-full text-[11px] transition-all duration-150',
+          'w-9 h-9 rounded-full text-[11px] sm:text-xs transition-all duration-150',
           'hover:scale-110 active:scale-95 focus:outline-none select-none',
           !isEdge && !hasRange && !isToday
             ? darkMode ? 'hover:bg-zinc-700' : 'hover:bg-zinc-100'
@@ -77,7 +70,7 @@ export default function DayCell({
         style={{
           backgroundColor: isEdge ? theme.primaryColor : undefined,
           boxShadow: isEdge
-            ? `0 2px 10px ${theme.primaryColor}55`
+            ? `0 2px 12px ${theme.primaryColor}55`
             : isToday
             ? `0 0 0 1.5px ${theme.primaryColor}`
             : undefined,
@@ -93,15 +86,13 @@ export default function DayCell({
       >
         <span className="leading-none">{day}</span>
 
-        {/* Indicators row */}
+        {/* Bottom indicator row: holiday emoji + moon phase */}
         <span className="flex items-center gap-[1px] leading-none" style={{ fontSize: '6px', marginTop: '1px', height: '7px' }}>
-          {holiday && <span role="img" aria-label={holiday.name} style={{ fontSize: '6px' }}>{holiday.emoji}</span>}
-          {moon.show && isCurrentMonth && (
-            <span role="img" aria-label={moon.name} style={{ fontSize: '6px' }}>{moon.emoji}</span>
-          )}
+          {holiday && <span role="img" aria-label={holiday.name}>{holiday.emoji}</span>}
+          {moon.show && isCurrentMonth && <span role="img" aria-label={moon.name}>{moon.emoji}</span>}
         </span>
 
-        {/* Today dot */}
+        {/* Today pulse dot */}
         {isToday && !isEdge && (
           <span
             className="absolute bottom-[2px] left-1/2 -translate-x-1/2 w-[4px] h-[4px] rounded-full"
@@ -109,6 +100,17 @@ export default function DayCell({
           />
         )}
       </button>
+
+      {/* Sticker badge (top-right corner of the cell) */}
+      {sticker && (
+        <span
+          className="absolute top-[1px] right-[1px] z-20 text-[10px] leading-none pointer-events-none select-none"
+          role="img"
+          aria-label="Sticker"
+        >
+          {sticker}
+        </span>
+      )}
     </div>
   );
 }
