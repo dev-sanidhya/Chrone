@@ -1,26 +1,82 @@
 @import "tailwindcss";
 
+/* ─── Custom properties ─────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f4f4f5;
+  --foreground: #18181b;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-playfair);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Base reset ────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Particle fall animation ───────────────────────────────── */
+@keyframes particleFall {
+  0% {
+    transform: translateY(-24px) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(110vh) translateX(var(--drift, 40px)) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.particle-fall {
+  animation: particleFall linear infinite;
+}
+
+/* ─── Subtle pulse for "today" indicator ────────────────────── */
+@keyframes todayPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.6); opacity: 0.5; }
+}
+
+.today-pulse {
+  animation: todayPulse 2s ease-in-out infinite;
+}
+
+/* ─── Thin custom scrollbar ─────────────────────────────────── */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156,163,175,0.4) transparent;
+}
+.scrollbar-thin::-webkit-scrollbar { width: 4px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(156,163,175,0.4);
+  border-radius: 99px;
+}
+
+/* ─── Calendar grid focus ring override ────────────────────── */
+button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
 }
