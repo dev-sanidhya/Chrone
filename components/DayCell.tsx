@@ -16,6 +16,7 @@ interface DayCellProps {
   sticker?: string;
   theme: MonthTheme;
   darkMode: boolean;
+  isMobile?: boolean;
   onClick: () => void;
   onDoubleClick: () => void;
   onHover: () => void;
@@ -25,7 +26,7 @@ interface DayCellProps {
 export default function DayCell({
   date, currentMonth, isToday, isStart, isEnd,
   isInRange, isRangePreview, holiday, sticker,
-  theme, darkMode, onClick, onDoubleClick, onHover, onLeave,
+  theme, darkMode, isMobile = false, onClick, onDoubleClick, onHover, onLeave,
 }: DayCellProps) {
   const isCurrentMonth = date.getMonth() === currentMonth;
   const day      = format(date, 'd');
@@ -41,7 +42,7 @@ export default function DayCell({
   return (
     <div
       className="relative flex items-center justify-center"
-      style={{ height: 38 }}
+      style={{ height: isMobile ? 42 : 38 }}
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
       onTouchStart={onHover}
@@ -61,7 +62,7 @@ export default function DayCell({
         ].filter(Boolean).join(' · ')}
         className={[
           'relative z-10 flex flex-col items-center justify-center',
-          'w-9 h-9 rounded-full text-[11px] sm:text-xs transition-all duration-150',
+          `${isMobile ? 'w-10 h-10 text-xs' : 'w-9 h-9 text-[11px] sm:text-xs'} rounded-full transition-all duration-150`,
           'hover:scale-110 active:scale-95 focus:outline-none select-none',
           !isEdge && !hasRange && !isToday
             ? darkMode ? 'hover:bg-zinc-700' : 'hover:bg-zinc-100'
@@ -87,7 +88,7 @@ export default function DayCell({
         <span className="leading-none">{day}</span>
 
         {/* Bottom indicator row: holiday emoji + moon phase */}
-        <span className="flex items-center gap-[1px] leading-none" style={{ fontSize: '6px', marginTop: '1px', height: '7px' }}>
+        <span className="flex items-center gap-[1px] leading-none" style={{ fontSize: isMobile ? '7px' : '6px', marginTop: '1px', height: isMobile ? '8px' : '7px' }}>
           {holiday && <span role="img" aria-label={holiday.name}>{holiday.emoji}</span>}
           {moon.show && isCurrentMonth && <span role="img" aria-label={moon.name}>{moon.emoji}</span>}
         </span>

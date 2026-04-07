@@ -74,7 +74,7 @@ export default function CalendarGrid({
 
   return (
     <div className={`relative flex flex-col flex-1 overflow-hidden transition-colors duration-300 ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
-      <div className={`flex flex-col gap-2 flex-1 ${isMobile ? 'p-4' : 'p-3'}`}>
+      <div className={`flex flex-col gap-2 flex-1 ${isMobile ? 'p-3' : 'p-3'}`}>
 
         {/* ── Month navigation ── */}
         <div className="flex items-center justify-between">
@@ -115,7 +115,7 @@ export default function CalendarGrid({
         </div>
 
         {/* ── Month stats ── */}
-        <div className={`flex items-center gap-2 ${isMobile ? 'text-[11px]' : 'text-[10px]'} font-medium ${dimText}`}>
+        <div className={`flex flex-wrap items-center gap-2 ${isMobile ? 'text-[10px]' : 'text-[10px]'} font-medium ${dimText}`}>
           <span>{totalDays} days</span>
           <span className="opacity-40">·</span>
           <span>{weekendDays} weekend</span>
@@ -135,10 +135,10 @@ export default function CalendarGrid({
               className="overflow-hidden"
             >
               <div
-                className="flex items-center justify-between px-3 py-2 rounded-xl text-[10px]"
+                className={`flex rounded-xl px-3 py-2 ${isMobile ? 'flex-col items-start gap-1.5 text-[9px]' : 'items-center justify-between text-[10px]'}`}
                 style={{ backgroundColor: `${theme.primaryColor}18` }}
               >
-                <span className="font-semibold" style={{ color: theme.primaryColor }}>
+                <span className="min-w-0 font-semibold leading-relaxed" style={{ color: theme.primaryColor }}>
                   {daysSelected
                     ? `${daysSelected} day${daysSelected!==1?'s':''} story · ${format(selectedRange.start,'MMM d')} → ${format(selectedRange.end!,'MMM d, yyyy')}`
                     : `Pinned on ${format(selectedRange.start,'MMM d, yyyy')}`}
@@ -192,6 +192,7 @@ export default function CalendarGrid({
                     sticker={events[dateKey]}
                     theme={theme}
                     darkMode={darkMode}
+                    isMobile={!!isMobile}
                     onClick={() => onDateClick(date)}
                     onDoubleClick={() => onOpenStickerPicker(dateKey)}
                     onHover={() => onDateHover(date)}
@@ -207,18 +208,18 @@ export default function CalendarGrid({
         <div className="flex items-center justify-between pt-1">
           <button
             onClick={onGoToToday}
-            className="flex items-center gap-1 text-[10px] font-semibold px-2.5 py-1.5 rounded-lg transition-all hover:scale-105 active:scale-95 touch-manipulation"
+            className={`flex items-center gap-1 font-semibold rounded-lg transition-all hover:scale-105 active:scale-95 touch-manipulation ${isMobile ? 'px-2 py-1.5 text-[9px]' : 'px-2.5 py-1.5 text-[10px]'}`}
             style={{ color: theme.primaryColor, backgroundColor: `${theme.primaryColor}15` }}
           >
             <RotateCcw size={10}/> Today
           </button>
-          <span className={`text-[9px] font-mono ${dimText}`}>
+          <span className={`font-mono ${isMobile ? 'text-[8px]' : 'text-[9px]'} ${dimText}`}>
             Wk {getISOWeek(currentDate)}
           </span>
         </div>
 
         {/* ── Double-tap hint ── */}
-        <p className={`text-center text-[8px] ${dimText} mt-0`}>
+        <p className={`text-center ${isMobile ? 'text-[7px]' : 'text-[8px]'} ${dimText} mt-0`}>
           Double-tap a date to pin a sticker
         </p>
       </div>

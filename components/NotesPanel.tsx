@@ -104,7 +104,7 @@ export default function NotesPanel({
 
   return (
     <aside
-      className={`flex min-h-0 flex-col border-r ${darkMode ? 'border-zinc-800' : 'border-black/5'} ${shell}`}
+      className={`flex min-h-0 flex-col ${isMobile ? 'border-t' : 'border-r'} ${darkMode ? 'border-zinc-800' : 'border-black/5'} ${shell}`}
       style={isMobile ? undefined : { width: 320, minWidth: 320, flexShrink: 0 }}
     >
       <div className={`grid gap-4 ${isMobile ? 'p-4' : 'p-5'}`}>
@@ -121,11 +121,11 @@ export default function NotesPanel({
             placeholder="Write a monthly headline, reminder, or personal theme..."
             className={`mt-4 w-full resize-none rounded-[1.2rem] border px-4 py-3 text-sm leading-relaxed focus:outline-none ${darkMode ? 'border-zinc-800 bg-zinc-900 text-zinc-200 placeholder-zinc-600' : 'border-black/10 bg-[#fffdf8] text-zinc-700 placeholder-zinc-400'}`}
           />
-          <div className="mt-3 flex items-center justify-between">
+          <div className={`mt-3 flex ${isMobile ? 'flex-col items-stretch gap-2.5' : 'items-center justify-between'}`}>
             <span className={`text-[10px] font-bold uppercase tracking-[0.2em] ${muted}`}>Always visible</span>
             <button
               onClick={saveMemo}
-              className="rounded-full px-4 py-2 text-[10px] font-bold uppercase tracking-[0.22em] text-white"
+              className={`rounded-full px-4 py-2 text-[10px] font-bold uppercase tracking-[0.22em] text-white ${isMobile ? 'w-full' : ''}`}
               style={{ backgroundColor: theme.primaryColor }}
             >
               {savedState === 'memo' ? 'Saved' : 'Save memo'}
@@ -188,13 +188,13 @@ export default function NotesPanel({
             className={`mt-4 w-full resize-none rounded-[1.2rem] border px-4 py-3 text-sm leading-relaxed focus:outline-none ${darkMode ? 'border-zinc-800 bg-zinc-900 text-zinc-200 placeholder-zinc-600' : 'border-black/10 bg-[#fffdf8] text-zinc-700 placeholder-zinc-400'}`}
           />
 
-          <div className="mt-4 flex items-center justify-between gap-3">
-            <div className="flex gap-2">
+          <div className={`mt-4 flex gap-3 ${isMobile ? 'flex-col items-stretch' : 'items-center justify-between'}`}>
+            <div className={`flex ${isMobile ? 'justify-center gap-3' : 'gap-2'}`}>
               {NOTE_COLORS.map((entry) => (
                 <button
                   key={entry.value}
                   onClick={() => setColor(entry.value)}
-                  className="h-3.5 w-3.5 rounded-full transition-transform"
+                  className={`${isMobile ? 'h-4 w-4' : 'h-3.5 w-3.5'} rounded-full transition-transform`}
                   style={{
                     backgroundColor: entry.dot,
                     transform: color === entry.value ? 'scale(1.22)' : 'scale(1)',
@@ -207,7 +207,7 @@ export default function NotesPanel({
             <button
               onClick={saveSelectionNote}
               disabled={!hasSelection || !noteDraft.trim()}
-              className="rounded-full px-4 py-2 text-[10px] font-bold uppercase tracking-[0.22em] text-white disabled:opacity-35"
+              className={`rounded-full px-4 py-2 text-[10px] font-bold uppercase tracking-[0.22em] text-white disabled:opacity-35 ${isMobile ? 'w-full' : ''}`}
               style={{ backgroundColor: theme.primaryColor }}
             >
               {savedState === 'note' ? 'Saved' : 'Save note'}
@@ -216,7 +216,7 @@ export default function NotesPanel({
         </section>
       </div>
 
-      <div className={`border-t ${darkMode ? 'border-zinc-800' : 'border-black/5'} px-5 pb-5 pt-4`}>
+      <div className={`${isMobile ? '' : 'border-t'} ${darkMode ? 'border-zinc-800' : 'border-black/5'} ${isMobile ? 'px-4 pb-4 pt-0' : 'px-5 pb-5 pt-4'}`}>
         <div className="flex items-center justify-between">
           <div>
             <p className={`text-[10px] font-black uppercase tracking-[0.32em] ${muted}`}>Memory Shelf</p>

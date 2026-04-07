@@ -286,7 +286,7 @@ export default function WallCalendar() {
 
       <div className="mx-auto flex w-full max-w-[1180px] items-start justify-center">
         <div
-          className="w-full"
+          className="w-full max-w-full"
           style={{
             perspective: '1500px',
             perspectiveOrigin: 'center center',
@@ -305,7 +305,7 @@ export default function WallCalendar() {
               className="w-full"
             >
               <div
-                className={`calendar-card flex w-full flex-col overflow-visible rounded-none sm:rounded-[2rem] paper-texture ${darkMode ? 'bg-zinc-900' : 'bg-[#fdf9f1]'}`}
+                className={`calendar-card flex w-full max-w-full flex-col overflow-visible rounded-none sm:rounded-[2rem] paper-texture ${darkMode ? 'bg-zinc-900' : 'bg-[#fdf9f1]'}`}
                 style={{ boxShadow: cardShadow }}
               >
                 <BindingRings primaryColor={theme.primaryColor} />

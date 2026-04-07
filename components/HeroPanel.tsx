@@ -60,7 +60,7 @@ export default function HeroPanel({
 
   return (
     <section
-      className={`relative overflow-hidden px-4 pb-6 pt-6 sm:px-6 sm:pb-8 lg:px-8 ${
+      className={`relative overflow-hidden px-3 pb-5 pt-5 sm:px-6 sm:pb-8 lg:px-8 ${
         darkMode ? 'bg-zinc-950 text-zinc-100' : 'bg-[#efe7db] text-zinc-900'
       }`}
     >
@@ -73,23 +73,23 @@ export default function HeroPanel({
         }}
       />
 
-      <div className="relative mb-6 flex items-center justify-between gap-4">
+      <div className="relative mb-4 flex items-center justify-between gap-3 sm:mb-6 sm:gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full border border-black/10 bg-white/70 text-xl shadow-[0_8px_16px_rgba(15,23,42,0.12)]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white/70 text-lg shadow-[0_8px_16px_rgba(15,23,42,0.12)] sm:h-12 sm:w-12 sm:text-xl">
             {theme.emoji}
           </div>
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.36em] text-zinc-500">
               Gallery Calendar
             </p>
-            <p className={`text-sm ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>{time}</p>
+            <p className={`text-[13px] sm:text-sm ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>{time}</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <button
             onClick={onOpenYearView}
-            className={`rounded-full border px-3 py-2 transition-transform hover:scale-[1.04] active:scale-[0.98] ${
+            className={`rounded-full border px-2.5 py-2 transition-transform hover:scale-[1.04] active:scale-[0.98] sm:px-3 ${
               darkMode
                 ? 'border-zinc-800 bg-zinc-900 text-zinc-200'
                 : 'border-black/10 bg-white/70 text-zinc-700'
@@ -100,7 +100,7 @@ export default function HeroPanel({
           </button>
           <button
             onClick={onToggleDarkMode}
-            className={`rounded-full border px-3 py-2 transition-transform hover:scale-[1.04] active:scale-[0.98] ${
+            className={`rounded-full border px-2.5 py-2 transition-transform hover:scale-[1.04] active:scale-[0.98] sm:px-3 ${
               darkMode
                 ? 'border-zinc-800 bg-zinc-900 text-yellow-300'
                 : 'border-black/10 bg-white/70 text-zinc-700'
@@ -112,14 +112,14 @@ export default function HeroPanel({
         </div>
       </div>
 
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.28fr)_minmax(300px,0.72fr)] lg:gap-8">
+      <div className="grid items-start gap-4 sm:gap-6 lg:grid-cols-[minmax(0,1.28fr)_minmax(300px,0.72fr)] lg:gap-8">
         <GalleryPrint theme={theme} currentDate={currentDate} artifact={artifact} />
 
         <motion.aside
           initial={{ opacity: 0, x: 8 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.28, delay: 0.06 }}
-          className={`flex flex-col rounded-[2rem] border p-5 shadow-[0_24px_48px_rgba(15,23,42,0.14)] ${
+          className={`flex flex-col rounded-[1.6rem] border p-4 shadow-[0_24px_48px_rgba(15,23,42,0.14)] sm:rounded-[2rem] sm:p-5 ${
             darkMode ? 'border-zinc-800 bg-zinc-900/92' : 'border-black/10 bg-white/76'
           }`}
         >
@@ -128,13 +128,13 @@ export default function HeroPanel({
               <p className="text-[10px] font-bold uppercase tracking-[0.34em] text-zinc-500">
                 Monthly Edition
               </p>
-              <h1 className="mt-2 text-4xl font-black uppercase leading-none sm:text-5xl">
+              <h1 className="mt-2 text-[2.4rem] font-black uppercase leading-none sm:text-5xl">
                 {format(currentDate, 'MMMM')}
               </h1>
-              <p className="mt-2 text-sm text-zinc-500">{format(currentDate, 'yyyy')}</p>
+              <p className="mt-1.5 text-[13px] text-zinc-500 sm:mt-2 sm:text-sm">{format(currentDate, 'yyyy')}</p>
             </div>
             <div
-              className="rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.26em] text-white"
+              className="rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.2em] text-white sm:px-3 sm:text-[10px] sm:tracking-[0.26em]"
               style={{ backgroundColor: theme.primaryColor }}
             >
               {artifact.label}
@@ -142,14 +142,14 @@ export default function HeroPanel({
           </div>
 
           <p
-            className={`mt-5 text-base leading-relaxed ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}
+            className={`mt-4 text-[15px] leading-relaxed sm:mt-5 sm:text-base ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}
             style={{ fontFamily: 'var(--font-playfair), serif' }}
           >
             {artifact.memoryPrompt}
           </p>
 
           <div
-            className={`mt-5 rounded-2xl border px-4 py-3 ${
+            className={`mt-4 rounded-2xl border px-4 py-3 sm:mt-5 ${
               darkMode ? 'border-zinc-800 bg-zinc-950' : 'border-black/10 bg-[#faf7f1]'
             }`}
           >
@@ -164,7 +164,7 @@ export default function HeroPanel({
           </div>
 
           <div
-            className={`mt-4 rounded-2xl border px-4 py-3 ${
+            className={`mt-3 rounded-2xl border px-4 py-3 sm:mt-4 ${
               darkMode ? 'border-zinc-800 bg-zinc-950' : 'border-black/10 bg-[#faf7f1]'
             }`}
           >
@@ -178,7 +178,7 @@ export default function HeroPanel({
             </p>
           </div>
 
-          <div className="mt-5">
+          <div className="mt-4 sm:mt-5">
             <div className="h-2 overflow-hidden rounded-full bg-black/8">
               <motion.div
                 initial={{ width: 0 }}
@@ -189,7 +189,7 @@ export default function HeroPanel({
               />
             </div>
 
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="mt-3 flex flex-wrap gap-2 sm:mt-4">
               {[
                 `${format(currentDate, 'MMMM')} print`,
                 'tear-off page flip',
@@ -198,7 +198,7 @@ export default function HeroPanel({
               ].map((label) => (
                 <span
                   key={label}
-                  className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] ${
+                  className={`rounded-full px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] sm:px-3 sm:text-[10px] sm:tracking-[0.18em] ${
                     darkMode ? 'bg-zinc-800 text-zinc-300' : 'bg-stone-100 text-zinc-600'
                   }`}
                 >
@@ -210,7 +210,7 @@ export default function HeroPanel({
         </motion.aside>
       </div>
 
-      <div className="relative mt-6 h-5">
+      <div className="relative mt-5 h-5 sm:mt-6">
         <div className="absolute inset-x-0 top-2 border-t border-dashed border-black/15" />
       </div>
     </section>
