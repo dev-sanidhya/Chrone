@@ -245,19 +245,19 @@ export default function HeroPanel({ theme, currentDate, darkMode, onToggleDarkMo
         </div>
       )}
 
-      {/* ── Quote strip (below diagonal, inside bottom of hero) ── */}
+      {/* ── Quote strip (middle-left, well above month) ── */}
       <AnimatePresence mode="wait">
         <motion.div
           key={`${theme.name}-${quoteIdx}`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{    opacity: 0 }}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{    opacity: 0, y: -8 }}
           transition={{ duration: 0.4 }}
-          className="absolute bottom-[28px] left-[48%] right-5 z-20 hidden sm:flex items-center gap-1.5"
+          className="absolute top-1/2 -translate-y-1/2 left-4 right-24 z-20 hidden sm:flex items-center gap-2"
         >
           <p
-            className="text-[9px] text-white/60 italic leading-tight line-clamp-2"
-            style={{ fontFamily: 'var(--font-playfair), serif' }}
+            className="text-[11px] text-white/85 italic leading-snug line-clamp-3"
+            style={{ fontFamily: 'var(--font-playfair), serif', textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}
           >
             &ldquo;{quote.text}&rdquo;
           </p>
