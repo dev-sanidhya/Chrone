@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Playfair_Display } from 'next/font/google';
+import { Inter, Playfair_Display, Patrick_Hand } from 'next/font/google';
 import './globals.css';
 
 const inter = Inter({
@@ -14,6 +14,13 @@ const playfair = Playfair_Display({
   display: 'swap',
 });
 
+const patrickHand = Patrick_Hand({
+  subsets: ['latin'],
+  weight: '400',
+  variable: '--font-patrick',
+  display: 'swap',
+});
+
 export const metadata: Metadata = {
   title: 'Chrone — Interactive Wall Calendar',
   description:
@@ -23,7 +30,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable} h-full`}>
+    <html lang="en" className={`${inter.variable} ${playfair.variable} ${patrickHand.variable} h-full`}>
       <body className="min-h-full font-sans antialiased">{children}</body>
     </html>
   );

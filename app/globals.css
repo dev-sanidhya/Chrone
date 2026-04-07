@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Patrick+Hand&display=swap');
 @import "tailwindcss";
 
 /* ─── Custom properties ─────────────────────────────────────── */
@@ -84,7 +83,7 @@ button:focus-visible {
 
 /* ─── Handwriting font helper ───────────────────────────────── */
 .font-handwriting {
-  font-family: 'Patrick Hand', 'Caveat', cursive;
+  font-family: var(--font-patrick), 'Caveat', cursive;
 }
 
 /* ─── Paper texture on calendar body ───────────────────────── */
