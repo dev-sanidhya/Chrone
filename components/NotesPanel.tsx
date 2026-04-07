@@ -66,8 +66,7 @@ export default function NotesPanel({
     const monthKey = format(currentDate, 'yyyy-MM');
     return notes
       .filter((note) => note.rangeStart.startsWith(monthKey))
-      .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
-      .slice(0, isMobile ? 2 : 3);
+      .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
   }, [currentDate, isMobile, notes]);
 
   const saveMemo = () => {
@@ -106,10 +105,10 @@ export default function NotesPanel({
   return (
     <aside
       className={`flex min-h-0 flex-col border-r ${darkMode ? 'border-zinc-800' : 'border-black/5'} ${shell}`}
-      style={isMobile ? undefined : { width: 254, minWidth: 254, flexShrink: 0 }}
+      style={isMobile ? undefined : { width: 320, minWidth: 320, flexShrink: 0 }}
     >
-      <div className={`grid gap-3 ${isMobile ? 'p-4' : 'p-4'}`}>
-        <section className={`rounded-[1.6rem] border p-4 shadow-[0_16px_28px_rgba(15,23,42,0.08)] ${card}`}>
+      <div className={`grid gap-4 ${isMobile ? 'p-4' : 'p-5'}`}>
+        <section className={`rounded-[1.7rem] border p-4 shadow-[0_20px_32px_rgba(15,23,42,0.08)] ${card}`}>
           <div className="flex items-center justify-between">
             <p className={`text-[10px] font-black uppercase tracking-[0.32em] ${muted}`}>Month Memo</p>
             <Pin size={14} style={{ color: theme.primaryColor }} />
@@ -118,9 +117,9 @@ export default function NotesPanel({
           <textarea
             value={memoDraft}
             onChange={(event) => setMemoDraft(event.target.value)}
-            rows={3}
+            rows={isMobile ? 6 : 5}
             placeholder="Write a monthly headline, reminder, or personal theme..."
-            className={`mt-3 w-full resize-none rounded-[1.1rem] border px-4 py-3 text-sm leading-relaxed focus:outline-none ${darkMode ? 'border-zinc-800 bg-zinc-900 text-zinc-200 placeholder-zinc-600' : 'border-black/10 bg-[#fffdf8] text-zinc-700 placeholder-zinc-400'}`}
+            className={`mt-4 w-full resize-none rounded-[1.2rem] border px-4 py-3 text-sm leading-relaxed focus:outline-none ${darkMode ? 'border-zinc-800 bg-zinc-900 text-zinc-200 placeholder-zinc-600' : 'border-black/10 bg-[#fffdf8] text-zinc-700 placeholder-zinc-400'}`}
           />
           <div className="mt-3 flex items-center justify-between">
             <span className={`text-[10px] font-bold uppercase tracking-[0.2em] ${muted}`}>Always visible</span>
@@ -134,7 +133,7 @@ export default function NotesPanel({
           </div>
         </section>
 
-        <section className={`rounded-[1.6rem] border p-4 shadow-[0_16px_28px_rgba(15,23,42,0.08)] ${card}`}>
+        <section className={`rounded-[1.7rem] border p-4 shadow-[0_20px_32px_rgba(15,23,42,0.08)] ${card}`}>
           <div className="flex items-center justify-between">
             <p className={`text-[10px] font-black uppercase tracking-[0.32em] ${muted}`}>Selection Note</p>
             {hasSelection && (
@@ -147,13 +146,13 @@ export default function NotesPanel({
             )}
           </div>
 
-          <div className={`mt-3 rounded-[1.1rem] border px-4 py-3 ${darkMode ? 'border-zinc-800 bg-zinc-900' : 'border-black/10 bg-[#fffdf8]'}`}>
+          <div className={`mt-4 rounded-[1.2rem] border px-4 py-3 ${darkMode ? 'border-zinc-800 bg-zinc-900' : 'border-black/10 bg-[#fffdf8]'}`}>
             {hasSelection ? (
               <>
                 <p className="text-sm font-semibold" style={{ color: theme.primaryColor }}>
                   {selectionLabel}
                 </p>
-                <p className={`mt-1 text-[11px] ${muted}`}>
+                <p className={`mt-2 text-[11px] ${muted}`}>
                   {selectedRange.end ? 'Range selected' : 'Single date selected'}
                 </p>
               </>
@@ -162,7 +161,7 @@ export default function NotesPanel({
             )}
           </div>
 
-          <div className="mt-3 flex flex-wrap gap-1.5">
+          <div className="mt-4 flex flex-wrap gap-2">
             {CATEGORY_ORDER.map((item) => {
               const active = category === item;
               return (
@@ -184,12 +183,12 @@ export default function NotesPanel({
           <textarea
             value={noteDraft}
             onChange={(event) => setNoteDraft(event.target.value)}
-            rows={3}
+            rows={isMobile ? 5 : 4}
             placeholder="Write what happened, what matters, or what you want to remember..."
-            className={`mt-3 w-full resize-none rounded-[1.1rem] border px-4 py-3 text-sm leading-relaxed focus:outline-none ${darkMode ? 'border-zinc-800 bg-zinc-900 text-zinc-200 placeholder-zinc-600' : 'border-black/10 bg-[#fffdf8] text-zinc-700 placeholder-zinc-400'}`}
+            className={`mt-4 w-full resize-none rounded-[1.2rem] border px-4 py-3 text-sm leading-relaxed focus:outline-none ${darkMode ? 'border-zinc-800 bg-zinc-900 text-zinc-200 placeholder-zinc-600' : 'border-black/10 bg-[#fffdf8] text-zinc-700 placeholder-zinc-400'}`}
           />
 
-          <div className="mt-3 flex items-center justify-between gap-2">
+          <div className="mt-4 flex items-center justify-between gap-3">
             <div className="flex gap-1.5">
               {NOTE_COLORS.map((entry) => (
                 <button
@@ -217,7 +216,7 @@ export default function NotesPanel({
         </section>
       </div>
 
-      <div className={`min-h-0 flex-1 border-t ${darkMode ? 'border-zinc-800' : 'border-black/5'} px-4 pb-4 pt-4`}>
+      <div className={`border-t ${darkMode ? 'border-zinc-800' : 'border-black/5'} px-5 pb-5 pt-4`}>
         <div className="flex items-center justify-between">
           <div>
             <p className={`text-[10px] font-black uppercase tracking-[0.32em] ${muted}`}>Memory Shelf</p>
@@ -226,7 +225,7 @@ export default function NotesPanel({
           <Bookmark size={14} style={{ color: theme.primaryColor }} />
         </div>
 
-        <div className="mt-3 flex flex-col gap-2">
+        <div className="mt-4 flex flex-col gap-3">
           <AnimatePresence initial={false}>
             {currentMonthNotes.length > 0 ? (
               currentMonthNotes.map((note) => {
@@ -239,7 +238,7 @@ export default function NotesPanel({
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10, height: 0 }}
-                    className="rounded-[1.1rem] border p-3 shadow-[0_12px_22px_rgba(15,23,42,0.06)]"
+                    className="rounded-[1.2rem] border p-4 shadow-[0_14px_24px_rgba(15,23,42,0.08)]"
                     style={{
                       backgroundColor: darkMode ? colorMeta.bgDark : colorMeta.bg,
                       borderColor: `${colorMeta.dot}55`,
@@ -259,7 +258,7 @@ export default function NotesPanel({
                             {note.rangeEnd !== note.rangeStart ? ` → ${format(new Date(note.rangeEnd), 'MMM d')}` : ''}
                           </span>
                         </div>
-                        <p className="mt-2 text-[11px] font-semibold" style={{ color: colorMeta.dot }}>
+                        <p className="mt-3 text-sm font-semibold" style={{ color: colorMeta.dot }}>
                           {note.title}
                         </p>
                       </div>
@@ -271,14 +270,14 @@ export default function NotesPanel({
                         <Trash2 size={12} />
                       </button>
                     </div>
-                    <p className={`mt-2 line-clamp-2 text-[11px] leading-relaxed ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                    <p className={`mt-3 text-sm leading-relaxed ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
                       {note.content}
                     </p>
                   </motion.div>
                 );
               })
             ) : (
-              <div className={`rounded-[1.1rem] border border-dashed p-4 text-sm ${darkMode ? 'border-zinc-800 text-zinc-500' : 'border-black/10 text-zinc-500'}`}>
+              <div className={`rounded-[1.2rem] border border-dashed p-4 text-sm ${darkMode ? 'border-zinc-800 text-zinc-500' : 'border-black/10 text-zinc-500'}`}>
                 Your saved memories will appear here.
               </div>
             )}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { addMonths, subMonths, format } from 'date-fns';
 import { getMonthTheme } from '@/lib/themes';
@@ -16,8 +16,6 @@ const STORAGE_KEY = 'chrone-notes-v3';
 const MEMO_KEY = 'chrone-month-memos-v1';
 const EVENTS_KEY = 'chrone-events-v1';
 const DARK_KEY = 'chrone-dark-mode';
-const DESKTOP_FRAME = { width: 980, height: 742 };
-
 const STICKERS = [
   '🎉','🎂','🎁','🎊','🥳','🎈',
   '✈️','🏖️','🏔️','🗺️','🚗','🏕️',
@@ -41,9 +39,6 @@ export default function WallCalendar() {
   const [confettiTrigger, setConfettiTrigger] = useState(0);
   const [mobileTab, setMobileTab] = useState<'calendar' | 'notes'>('calendar');
   const [stickerPickerDate, setStickerPickerDate] = useState<string | null>(null);
-  const [desktopScale, setDesktopScale] = useState(1);
-  const [isDesktop, setIsDesktop] = useState(false);
-
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -66,32 +61,6 @@ export default function WallCalendar() {
     try {
       if (localStorage.getItem(DARK_KEY) === 'true') setDarkMode(true);
     } catch {}
-  }, []);
-
-  useEffect(() => {
-    const updateFrame = () => {
-      const desktop = window.innerWidth >= 640;
-      setIsDesktop(desktop);
-
-      if (!desktop) {
-        setDesktopScale(1);
-        return;
-      }
-
-      const availableWidth = window.innerWidth - 40;
-      const availableHeight = window.innerHeight - 36;
-      setDesktopScale(
-        Math.min(
-          1,
-          availableWidth / DESKTOP_FRAME.width,
-          availableHeight / DESKTOP_FRAME.height,
-        ),
-      );
-    };
-
-    updateFrame();
-    window.addEventListener('resize', updateFrame);
-    return () => window.removeEventListener('resize', updateFrame);
   }, []);
 
   useEffect(() => {
@@ -214,26 +183,6 @@ export default function WallCalendar() {
     onOpenStickerPicker: (dateKey: string) => setStickerPickerDate(dateKey),
   };
 
-  const frameStyle = useMemo(() => {
-    if (!isDesktop) return { width: '100%', height: '100%' };
-
-    return {
-      width: `${DESKTOP_FRAME.width * desktopScale}px`,
-      height: `${DESKTOP_FRAME.height * desktopScale}px`,
-    };
-  }, [desktopScale, isDesktop]);
-
-  const cardStyle = useMemo(() => {
-    if (!isDesktop) return { width: '100%', height: '100%' };
-
-    return {
-      width: `${DESKTOP_FRAME.width}px`,
-      height: `${DESKTOP_FRAME.height}px`,
-      transform: `scale(${desktopScale})`,
-      transformOrigin: 'top center',
-    };
-  }, [desktopScale, isDesktop]);
-
   const outerBg = darkMode
     ? 'bg-zinc-950'
     : 'bg-[radial-gradient(circle_at_top,_#f8f0e0,_#ebe7de_44%,_#d7d2cb_100%)]';
@@ -250,7 +199,7 @@ export default function WallCalendar() {
 
   return (
     <div
-      className={`h-[100dvh] overflow-hidden flex items-center justify-center transition-colors duration-500 ${outerBg} p-0 sm:p-4`}
+      className={`min-h-screen flex items-start md:items-center justify-center transition-colors duration-500 ${outerBg} p-0 md:p-6`}
       style={{ '--theme-primary': theme.primaryColor } as React.CSSProperties}
     >
       <Confetti trigger={confettiTrigger} />
@@ -335,113 +284,109 @@ export default function WallCalendar() {
         )}
       </AnimatePresence>
 
-      <div className="flex h-full w-full items-center justify-center">
+      <div className="mx-auto flex w-full max-w-[1180px] items-start justify-center">
         <div
-          className="flex items-center justify-center"
+          className="w-full"
           style={{
-            ...frameStyle,
             perspective: '1500px',
             perspectiveOrigin: 'center center',
           }}
         >
-          <div style={cardStyle}>
-            <AnimatePresence mode="wait" custom={direction}>
-              <motion.div
-                key={format(currentDate, 'yyyy-MM')}
-                custom={direction}
-                variants={flipVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.36, ease: [0.25, 0.46, 0.45, 0.94] }}
-                style={{ transformStyle: 'preserve-3d', transformOrigin: 'center top' }}
-                className="h-full w-full"
+          <AnimatePresence mode="wait" custom={direction}>
+            <motion.div
+              key={format(currentDate, 'yyyy-MM')}
+              custom={direction}
+              variants={flipVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.36, ease: [0.25, 0.46, 0.45, 0.94] }}
+              style={{ transformStyle: 'preserve-3d', transformOrigin: 'center top' }}
+              className="w-full"
+            >
+              <div
+                className={`calendar-card flex w-full flex-col overflow-hidden rounded-none sm:rounded-[2rem] paper-texture ${darkMode ? 'bg-zinc-900' : 'bg-[#fdf9f1]'}`}
+                style={{ boxShadow: cardShadow }}
               >
-                <div
-                  className={`calendar-card flex h-full w-full flex-col overflow-hidden rounded-none sm:rounded-[2rem] paper-texture ${darkMode ? 'bg-zinc-900' : 'bg-[#fdf9f1]'}`}
-                  style={{ boxShadow: cardShadow }}
-                >
-                  <BindingRings primaryColor={theme.primaryColor} />
+                <BindingRings primaryColor={theme.primaryColor} />
 
-                  <HeroPanel
-                    theme={theme}
+                <HeroPanel
+                  theme={theme}
+                  currentDate={currentDate}
+                  darkMode={darkMode}
+                  monthMemo={monthMemo}
+                  onToggleDarkMode={toggleDark}
+                  onOpenYearView={() => setShowYearView(true)}
+                />
+
+                <div className="hidden sm:flex" style={{ minHeight: 420 }}>
+                  <NotesPanel
                     currentDate={currentDate}
-                    darkMode={darkMode}
+                    selectedRange={selectedRange}
+                    notes={notes}
                     monthMemo={monthMemo}
-                    onToggleDarkMode={toggleDark}
-                    onOpenYearView={() => setShowYearView(true)}
+                    onSaveMonthMemo={persistMonthMemo}
+                    onSaveNotes={persistNotes}
+                    onClearSelection={clearSelection}
+                    theme={theme}
+                    darkMode={darkMode}
                   />
+                  <CalendarGrid {...calendarGridProps} />
+                </div>
 
-                  <div className="hidden min-h-0 flex-1 sm:flex">
-                    <NotesPanel
-                      currentDate={currentDate}
-                      selectedRange={selectedRange}
-                      notes={notes}
-                      monthMemo={monthMemo}
-                      onSaveMonthMemo={persistMonthMemo}
-                      onSaveNotes={persistNotes}
-                      onClearSelection={clearSelection}
-                      theme={theme}
-                      darkMode={darkMode}
-                    />
-                    <CalendarGrid {...calendarGridProps} />
-                  </div>
-
-                  <div className="flex min-h-0 flex-1 flex-col sm:hidden">
-                    <div className={`flex border-b ${darkMode ? 'border-zinc-800' : 'border-zinc-100'}`}>
-                      {(['calendar', 'notes'] as const).map((tab) => (
-                        <button
-                          key={tab}
-                          onClick={() => setMobileTab(tab)}
-                          className="relative flex-1 py-2.5 text-[11px] font-bold uppercase tracking-widest transition-colors"
-                          style={{
-                            color: mobileTab === tab ? theme.primaryColor : darkMode ? '#71717a' : '#a1a1aa',
-                          }}
-                        >
-                          {tab}
-                          {mobileTab === tab && (
-                            <motion.div
-                              layoutId="mobile-tab-indicator"
-                              className="absolute bottom-0 left-4 right-4 h-[2px] rounded-full"
-                              style={{ backgroundColor: theme.primaryColor }}
-                            />
-                          )}
-                        </button>
-                      ))}
-                    </div>
-
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={mobileTab}
-                        initial={{ opacity: 0, x: mobileTab === 'calendar' ? -16 : 16 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.18 }}
-                        className="min-h-0 flex-1"
+                <div className="flex flex-col sm:hidden">
+                  <div className={`flex border-b ${darkMode ? 'border-zinc-800' : 'border-zinc-100'}`}>
+                    {(['calendar', 'notes'] as const).map((tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => setMobileTab(tab)}
+                        className="relative flex-1 py-2.5 text-[11px] font-bold uppercase tracking-widest transition-colors"
+                        style={{
+                          color: mobileTab === tab ? theme.primaryColor : darkMode ? '#71717a' : '#a1a1aa',
+                        }}
                       >
-                        {mobileTab === 'calendar' ? (
-                          <CalendarGrid {...calendarGridProps} isMobile />
-                        ) : (
-                          <NotesPanel
-                            currentDate={currentDate}
-                            selectedRange={selectedRange}
-                            notes={notes}
-                            monthMemo={monthMemo}
-                            onSaveMonthMemo={persistMonthMemo}
-                            onSaveNotes={persistNotes}
-                            onClearSelection={clearSelection}
-                            theme={theme}
-                            darkMode={darkMode}
-                            isMobile
+                        {tab}
+                        {mobileTab === tab && (
+                          <motion.div
+                            layoutId="mobile-tab-indicator"
+                            className="absolute bottom-0 left-4 right-4 h-[2px] rounded-full"
+                            style={{ backgroundColor: theme.primaryColor }}
                           />
                         )}
-                      </motion.div>
-                    </AnimatePresence>
+                      </button>
+                    ))}
                   </div>
+
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={mobileTab}
+                      initial={{ opacity: 0, x: mobileTab === 'calendar' ? -16 : 16 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.18 }}
+                    >
+                      {mobileTab === 'calendar' ? (
+                        <CalendarGrid {...calendarGridProps} isMobile />
+                      ) : (
+                        <NotesPanel
+                          currentDate={currentDate}
+                          selectedRange={selectedRange}
+                          notes={notes}
+                          monthMemo={monthMemo}
+                          onSaveMonthMemo={persistMonthMemo}
+                          onSaveNotes={persistNotes}
+                          onClearSelection={clearSelection}
+                          theme={theme}
+                          darkMode={darkMode}
+                          isMobile
+                        />
+                      )}
+                    </motion.div>
+                  </AnimatePresence>
                 </div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </div>

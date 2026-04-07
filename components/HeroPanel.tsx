@@ -60,10 +60,9 @@ export default function HeroPanel({
 
   return (
     <section
-      className={`relative shrink-0 overflow-hidden px-5 pb-3 pt-4 ${
-        darkMode ? 'bg-[#0f1115] text-zinc-100' : 'bg-[#efe7db] text-zinc-900'
+      className={`relative overflow-hidden px-4 pb-6 pt-6 sm:px-6 sm:pb-8 lg:px-8 ${
+        darkMode ? 'bg-zinc-950 text-zinc-100' : 'bg-[#efe7db] text-zinc-900'
       }`}
-      style={{ height: 302 }}
     >
       <div
         className="pointer-events-none absolute inset-0"
@@ -74,9 +73,9 @@ export default function HeroPanel({
         }}
       />
 
-      <div className="relative mb-3 flex items-center justify-between">
+      <div className="relative mb-6 flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full border border-black/10 bg-white/70 text-xl shadow-[0_8px_16px_rgba(15,23,42,0.12)]">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full border border-black/10 bg-white/70 text-xl shadow-[0_8px_16px_rgba(15,23,42,0.12)]">
             {theme.emoji}
           </div>
           <div>
@@ -113,14 +112,14 @@ export default function HeroPanel({
         </div>
       </div>
 
-      <div className="grid h-[228px] grid-cols-[1.58fr_270px] gap-4">
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.28fr)_minmax(300px,0.72fr)] lg:gap-8">
         <GalleryPrint theme={theme} currentDate={currentDate} artifact={artifact} />
 
         <motion.aside
           initial={{ opacity: 0, x: 8 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.28, delay: 0.06 }}
-          className={`flex h-full flex-col rounded-[2rem] border p-4 shadow-[0_22px_44px_rgba(15,23,42,0.12)] ${
+          className={`flex flex-col rounded-[2rem] border p-5 shadow-[0_24px_48px_rgba(15,23,42,0.14)] ${
             darkMode ? 'border-zinc-800 bg-zinc-900/92' : 'border-black/10 bg-white/76'
           }`}
         >
@@ -129,22 +128,40 @@ export default function HeroPanel({
               <p className="text-[10px] font-bold uppercase tracking-[0.34em] text-zinc-500">
                 Monthly Edition
               </p>
-              <h1 className="mt-2 text-[3.15rem] font-black uppercase leading-[0.86] text-zinc-900">
+              <h1 className="mt-2 text-4xl font-black uppercase leading-none sm:text-5xl">
                 {format(currentDate, 'MMMM')}
               </h1>
               <p className="mt-2 text-sm text-zinc-500">{format(currentDate, 'yyyy')}</p>
             </div>
             <div
-              className="rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.24em] text-white"
+              className="rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.26em] text-white"
               style={{ backgroundColor: theme.primaryColor }}
             >
               {artifact.label}
             </div>
           </div>
 
-          <p className={`mt-4 text-sm leading-relaxed ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+          <p
+            className={`mt-5 text-base leading-relaxed ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}
+            style={{ fontFamily: 'var(--font-playfair), serif' }}
+          >
             {artifact.memoryPrompt}
           </p>
+
+          <div
+            className={`mt-5 rounded-2xl border px-4 py-3 ${
+              darkMode ? 'border-zinc-800 bg-zinc-950' : 'border-black/10 bg-[#faf7f1]'
+            }`}
+          >
+            <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-zinc-500">
+              Month Memo
+            </p>
+            <p className={`mt-2 text-sm leading-relaxed ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+              {monthMemo.trim()
+                ? monthMemo
+                : 'The memo rail below stays visible all month as your handwritten margin.'}
+            </p>
+          </div>
 
           <div
             className={`mt-4 rounded-2xl border px-4 py-3 ${
@@ -152,16 +169,16 @@ export default function HeroPanel({
             }`}
           >
             <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-zinc-500">
-              Month Memo
+              Next Marker
             </p>
-            <p className={`mt-2 text-sm ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-              {monthMemo.trim()
-                ? monthMemo
-                : 'The memo rail below stays visible all month as your handwritten margin.'}
+            <p className={`mt-2 text-sm leading-relaxed ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+              {showHoliday && nextHoliday
+                ? `${nextHoliday.emoji} ${nextHoliday.name}${diffDays === 0 ? ' is today.' : ` lands in ${diffDays} days.`}`
+                : 'No nearby holiday marker. The month stays open for your own plans and saved memories.'}
             </p>
           </div>
 
-          <div className="mt-auto">
+          <div className="mt-5">
             <div className="h-2 overflow-hidden rounded-full bg-black/8">
               <motion.div
                 initial={{ width: 0 }}
@@ -172,17 +189,29 @@ export default function HeroPanel({
               />
             </div>
 
-            {showHoliday && (
-              <div className="mt-3 inline-flex rounded-full bg-stone-100 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-600">
-                {showHoliday.emoji} {showHoliday.name}{diffDays === 0 ? ' today' : ` in ${diffDays}d`}
-              </div>
-            )}
+            <div className="mt-4 flex flex-wrap gap-2">
+              {[
+                `${format(currentDate, 'MMMM')} print`,
+                'tear-off page flip',
+                'month memo',
+                'selection memory',
+              ].map((label) => (
+                <span
+                  key={label}
+                  className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] ${
+                    darkMode ? 'bg-zinc-800 text-zinc-300' : 'bg-stone-100 text-zinc-600'
+                  }`}
+                >
+                  {label}
+                </span>
+              ))}
+            </div>
           </div>
         </motion.aside>
       </div>
 
-      <div className="relative mt-3 h-4">
-        <div className="absolute inset-x-0 top-1.5 border-t border-dashed border-black/15" />
+      <div className="relative mt-6 h-5">
+        <div className="absolute inset-x-0 top-2 border-t border-dashed border-black/15" />
       </div>
     </section>
   );
