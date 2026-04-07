@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { format, getDaysInMonth, differenceInDays } from 'date-fns';
-import { Moon, Sun, Calendar } from 'lucide-react';
+import { format, getDaysInMonth } from 'date-fns';
+import { Moon, Sun } from 'lucide-react';
 import type { MonthTheme } from '@/lib/types';
 import { getNextHoliday } from '@/lib/holidays';
 import Particles from './Particles';
+import SeasonScene from './SeasonScene';
 
 interface HeroPanelProps {
   theme: MonthTheme;
@@ -19,156 +20,129 @@ export default function HeroPanel({ theme, currentDate, darkMode, onToggleDarkMo
   const [time, setTime] = useState('');
 
   useEffect(() => {
-    const tick = () => setTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    const tick = () =>
+      setTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, []);
 
   const today = new Date();
+  const isCurrentMonth =
+    currentDate.getMonth() === today.getMonth() &&
+    currentDate.getFullYear() === today.getFullYear();
   const daysInMonth = getDaysInMonth(currentDate);
-  const dayOfMonth = currentDate.getMonth() === today.getMonth() && currentDate.getFullYear() === today.getFullYear()
-    ? today.getDate()
-    : 0;
-  const progressPct = dayOfMonth > 0 ? Math.round((dayOfMonth / daysInMonth) * 100) : 0;
+  const progressPct = isCurrentMonth ? Math.round((today.getDate() / daysInMonth) * 100) : 0;
 
   const nextHoliday = getNextHoliday(today);
-  const daysUntil = nextHoliday ? differenceInDays(nextHoliday.date, today) : null;
+  const monthName = format(currentDate, 'MMMM').toUpperCase();
+  const year = format(currentDate, 'yyyy');
 
   return (
-    <div
-      className="relative w-full lg:w-[340px] xl:w-[380px] min-h-[260px] lg:min-h-full overflow-hidden flex-shrink-0"
-      style={{
-        background: `linear-gradient(150deg, ${theme.heroGradientFrom} 0%, ${theme.heroGradientVia} 55%, ${theme.heroGradientTo} 100%)`,
-      }}
-    >
-      {/* Animated particles */}
-      <Particles type={theme.particles} />
+    /* Hero area — same aspect ratio as reference (~5:3) */
+    <div className="relative w-full overflow-hidden" style={{ aspectRatio: '5/3' }}>
+      {/* ── Seasonal SVG illustration ── */}
+      <SeasonScene season={theme.season} month={theme.month} primaryColor={theme.primaryColor} />
 
-      {/* Radial glow orbs */}
+      {/* ── Floating particles overlay ── */}
+      <div className="absolute inset-0 pointer-events-none">
+        <Particles type={theme.particles} />
+      </div>
+
+      {/* ── Top controls bar ── */}
+      <div className="absolute top-0 left-0 right-0 flex items-start justify-between p-3 z-20">
+        {/* Live clock */}
+        <span className="text-[10px] font-mono text-white/60 tabular-nums tracking-widest bg-black/20 px-2 py-1 rounded-lg backdrop-blur-sm">
+          {time}
+        </span>
+
+        {/* Dark mode toggle */}
+        <button
+          onClick={onToggleDarkMode}
+          className="p-1.5 rounded-full transition-all hover:scale-110 active:scale-95 backdrop-blur-sm"
+          style={{ background: 'rgba(0,0,0,0.3)' }}
+          aria-label="Toggle dark mode"
+        >
+          {darkMode
+            ? <Sun  size={14} className="text-yellow-300" />
+            : <Moon size={14} className="text-white"      />}
+        </button>
+      </div>
+
+      {/* ── Diagonal overlay — DARK band (reference aesthetic) ── */}
       <div
-        className="absolute -top-20 -right-20 w-64 h-64 rounded-full opacity-20 pointer-events-none"
-        style={{ background: `radial-gradient(circle, ${theme.primaryColor}, transparent 70%)` }}
-      />
+        className="absolute inset-0 z-10 pointer-events-none"
+        style={{ clipPath: 'polygon(0 58%, 100% 40%, 100% 100%, 0 100%)' }}
+        aria-hidden
+      >
+        {/* Dark gradient band */}
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent, rgba(4,8,22,0.88) 30%, rgba(4,8,22,0.94))' }} />
+      </div>
+
+      {/* ── Diagonal accent color triangle (bottom-left) ── */}
       <div
-        className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full opacity-15 pointer-events-none"
-        style={{ background: `radial-gradient(circle, ${theme.accentColor}, transparent 70%)` }}
-      />
+        className="absolute inset-0 z-10 pointer-events-none"
+        style={{ clipPath: 'polygon(0 72%, 42% 100%, 0 100%)' }}
+        aria-hidden
+      >
+        <div className="absolute inset-0" style={{ backgroundColor: theme.primaryColor }} />
+      </div>
 
-      {/* Content */}
-      <div className="relative z-10 flex flex-col h-full p-7 text-white">
-        {/* Top row */}
-        <div className="flex items-start justify-between mb-5">
-          <div className="text-xs font-mono opacity-60 tabular-nums tracking-wider">{time}</div>
-          <button
-            onClick={onToggleDarkMode}
-            className="p-2 rounded-full transition-all hover:scale-110 active:scale-95"
-            style={{ background: 'rgba(255,255,255,0.15)' }}
-            aria-label="Toggle dark mode"
-          >
-            {darkMode ? <Sun size={15} /> : <Moon size={15} />}
-          </button>
-        </div>
-
-        {/* Big emoji */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={theme.emoji + theme.name}
-            initial={{ scale: 0.4, opacity: 0, rotate: -20 }}
-            animate={{ scale: 1, opacity: 1, rotate: 0 }}
-            exit={{ scale: 0.4, opacity: 0, rotate: 20 }}
-            transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-            className="text-6xl xl:text-7xl mb-4 select-none"
-            style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.4))' }}
-          >
-            {theme.emoji}
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Month name */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={theme.name}
-            initial={{ x: -40, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: 40, opacity: 0 }}
-            transition={{ duration: 0.35, ease: 'easeOut' }}
-          >
-            <h1 className="text-4xl xl:text-5xl font-black tracking-tight leading-none uppercase">
-              {theme.name}
-            </h1>
-            <p className="text-xl xl:text-2xl font-light opacity-70 mt-0.5">
-              {format(currentDate, 'yyyy')}
-            </p>
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Coloured divider */}
+      {/* ── Month / Year text on dark band ── */}
+      <AnimatePresence mode="wait">
         <motion.div
-          key={theme.primaryColor}
-          initial={{ width: 0 }}
-          animate={{ width: 64 }}
-          transition={{ duration: 0.5, delay: 0.15 }}
-          className="h-1 rounded-full mt-4 mb-5"
-          style={{ backgroundColor: theme.primaryColor, width: 64 }}
-        />
-
-        {/* Progress bar (days elapsed this month) */}
-        {dayOfMonth > 0 && (
-          <div className="mb-5">
-            <div className="flex justify-between text-[10px] opacity-60 mb-1.5">
-              <span>Day {dayOfMonth}</span>
-              <span>{daysInMonth - dayOfMonth} days left</span>
-            </div>
-            <div className="w-full h-1.5 rounded-full bg-white/20 overflow-hidden">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${progressPct}%` }}
-                transition={{ duration: 0.8, ease: 'easeOut' }}
-                className="h-full rounded-full"
-                style={{ backgroundColor: theme.accentColor }}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Quote */}
-        <AnimatePresence mode="wait">
-          <motion.blockquote
-            key={theme.quote}
-            initial={{ y: 16, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -16, opacity: 0 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-            className="text-[11px] xl:text-xs opacity-75 italic leading-relaxed"
+          key={theme.name}
+          initial={{ y: 18, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -12, opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="absolute bottom-5 right-5 z-20 text-right text-white"
+        >
+          <p className="text-sm font-light opacity-75 tracking-[0.2em]">{year}</p>
+          <h1
+            className="text-4xl sm:text-5xl font-black tracking-widest leading-none"
+            style={{ textShadow: '0 2px 12px rgba(0,0,0,0.5)' }}
           >
-            &ldquo;{theme.quote}&rdquo;
-            <footer className="mt-1.5 text-[10px] opacity-60 not-italic">
-              — {theme.author}
-            </footer>
-          </motion.blockquote>
-        </AnimatePresence>
+            {monthName}
+          </h1>
+        </motion.div>
+      </AnimatePresence>
 
-        {/* Next holiday pill */}
-        {nextHoliday && daysUntil !== null && daysUntil <= 30 && (
+      {/* ── Progress bar (month elapsed) ── */}
+      {isCurrentMonth && (
+        <div className="absolute bottom-2 left-0 right-0 z-20 px-4">
+          <div className="w-full h-[2px] rounded-full bg-white/15 overflow-hidden">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${progressPct}%` }}
+              transition={{ duration: 1, ease: 'easeOut', delay: 0.3 }}
+              className="h-full rounded-full"
+              style={{ backgroundColor: theme.accentColor }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ── Holiday pill (top-left, if upcoming) ── */}
+      {nextHoliday && (() => {
+        const diff = Math.round((nextHoliday.date.getTime() - today.getTime()) / 86400000);
+        if (diff > 20 || diff < 0) return null;
+        return (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="mt-auto pt-4 flex items-center gap-2"
+            initial={{ opacity: 0, x: -12 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5 }}
+            className="absolute bottom-10 left-4 z-20"
           >
             <div
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold"
-              style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)' }}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold text-white"
+              style={{ background: `${theme.primaryColor}cc`, backdropFilter: 'blur(8px)' }}
             >
-              <Calendar size={10} />
-              <span>
-                {nextHoliday.emoji} {nextHoliday.name} in {daysUntil} day{daysUntil !== 1 ? 's' : ''}
-              </span>
+              {nextHoliday.emoji} {nextHoliday.name} in {diff}d
             </div>
           </motion.div>
-        )}
-      </div>
+        );
+      })()}
     </div>
   );
 }

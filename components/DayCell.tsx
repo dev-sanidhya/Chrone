@@ -2,6 +2,7 @@
 
 import { format } from 'date-fns';
 import type { MonthTheme, Holiday } from '@/lib/types';
+import { getMoonPhase } from '@/lib/utils';
 
 interface DayCellProps {
   date: Date;
@@ -40,92 +41,70 @@ export default function DayCell({
   const isEdge = isStart || isEnd;
   const hasRange = isInRange || isRangePreview;
 
-  // Range connector background (runs full-width behind the circle)
-  const showLeftConnector = (isInRange || isRangePreview || isEnd) && !isStart;
-  const showRightConnector = (isInRange || isRangePreview || isStart) && !isEnd;
+  // Moon phase — only show significant ones
+  const moon = getMoonPhase(date);
 
-  const connectorBg = isRangePreview
-    ? `${theme.primaryColor}18`
-    : `${theme.primaryColor}28`;
-
-  const circleBg = isEdge
-    ? theme.primaryColor
-    : isToday
-    ? 'transparent'
-    : 'transparent';
-
-  const textClass = isEdge
-    ? 'text-white font-bold'
-    : !isCurrentMonth
-    ? darkMode ? 'text-zinc-700' : 'text-zinc-300'
-    : isWeekend
-    ? darkMode ? 'text-blue-400' : 'text-blue-500'
-    : darkMode
-    ? 'text-zinc-200'
-    : 'text-zinc-700';
+  // Connector halves for range highlight
+  const leftConn  = (hasRange || isEnd)   && !isStart;
+  const rightConn = (hasRange || isStart) && !isEnd;
+  const connBg = isRangePreview ? `${theme.primaryColor}15` : `${theme.primaryColor}22`;
 
   return (
     <div
       className="relative flex items-center justify-center"
-      style={{ height: 40 }}
+      style={{ height: 36 }}
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
     >
-      {/* Left connector half */}
-      {showLeftConnector && (
-        <div
-          className="absolute left-0 top-1/2 -translate-y-1/2 w-1/2 h-7 pointer-events-none"
-          style={{ backgroundColor: connectorBg }}
-        />
-      )}
-      {/* Right connector half */}
-      {showRightConnector && (
-        <div
-          className="absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-7 pointer-events-none"
-          style={{ backgroundColor: connectorBg }}
-        />
-      )}
+      {leftConn  && <div className="absolute left-0  top-1/2 -translate-y-1/2 w-1/2 h-7 pointer-events-none" style={{ backgroundColor: connBg }}/>}
+      {rightConn && <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-7 pointer-events-none" style={{ backgroundColor: connBg }}/>}
 
       <button
         onClick={onClick}
-        title={holiday ? `${holiday.emoji} ${holiday.name}` : format(date, 'EEEE, MMMM d')}
+        title={[
+          format(date, 'EEEE, MMMM d'),
+          holiday ? `${holiday.emoji} ${holiday.name}` : '',
+          moon.show ? moon.name : '',
+        ].filter(Boolean).join(' · ')}
         className={[
           'relative z-10 flex flex-col items-center justify-center',
-          'w-9 h-9 rounded-full text-sm transition-all duration-150',
-          'hover:scale-110 active:scale-95 focus:outline-none',
+          'w-8 h-8 rounded-full text-[11px] transition-all duration-150',
+          'hover:scale-110 active:scale-95 focus:outline-none select-none',
           !isEdge && !hasRange && !isToday
-            ? darkMode
-              ? 'hover:bg-zinc-700'
-              : 'hover:bg-zinc-100'
+            ? darkMode ? 'hover:bg-zinc-700' : 'hover:bg-zinc-100'
             : '',
-          textClass,
         ].join(' ')}
         style={{
-          backgroundColor: circleBg || undefined,
+          backgroundColor: isEdge ? theme.primaryColor : undefined,
           boxShadow: isEdge
-            ? `0 2px 12px ${theme.primaryColor}60`
+            ? `0 2px 10px ${theme.primaryColor}55`
             : isToday
-            ? `0 0 0 2px ${theme.primaryColor}`
+            ? `0 0 0 1.5px ${theme.primaryColor}`
             : undefined,
+          color: isEdge
+            ? 'white'
+            : !isCurrentMonth
+            ? darkMode ? '#52525b' : '#d4d4d8'
+            : isWeekend
+            ? darkMode ? '#93c5fd' : '#3b82f6'
+            : darkMode ? '#e4e4e7' : '#27272a',
+          fontWeight: isToday || isEdge ? 700 : 400,
         }}
       >
         <span className="leading-none">{day}</span>
 
-        {/* Holiday dot */}
-        {holiday && (
-          <span
-            className="text-[7px] leading-none mt-[1px] select-none"
-            role="img"
-            aria-label={holiday.name}
-          >
-            {holiday.emoji}
-          </span>
-        )}
+        {/* Indicators row */}
+        <span className="flex items-center gap-[1px] leading-none" style={{ fontSize: '6px', marginTop: '1px', height: '7px' }}>
+          {holiday && <span role="img" aria-label={holiday.name} style={{ fontSize: '6px' }}>{holiday.emoji}</span>}
+          {moon.show && isCurrentMonth && (
+            <span role="img" aria-label={moon.name} style={{ fontSize: '6px' }}>{moon.emoji}</span>
+          )}
+        </span>
 
-        {/* Today pulse dot */}
+        {/* Today dot */}
         {isToday && !isEdge && (
           <span
-            className="absolute bottom-[3px] left-1/2 -translate-x-1/2 w-[5px] h-[5px] rounded-full"
+            className="absolute bottom-[2px] left-1/2 -translate-x-1/2 w-[4px] h-[4px] rounded-full"
             style={{ backgroundColor: theme.primaryColor }}
           />
         )}

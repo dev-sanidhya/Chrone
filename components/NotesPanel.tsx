@@ -3,17 +3,19 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format, differenceInDays } from 'date-fns';
-import { FileText, Save, Trash2, X, Plus, ChevronDown, ChevronUp } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import type { DateRange, Note, NoteColor, MonthTheme } from '@/lib/types';
 
-const NOTE_COLORS: { value: NoteColor; bg: string; bgDark: string; border: string; label: string }[] = [
-  { value: 'yellow',  bg: '#fefce8', bgDark: '#422006', border: '#eab308', label: 'Yellow'  },
-  { value: 'rose',    bg: '#fff1f2', bgDark: '#4c0519', border: '#f43f5e', label: 'Rose'    },
-  { value: 'sky',     bg: '#f0f9ff', bgDark: '#0c4a6e', border: '#38bdf8', label: 'Sky'     },
-  { value: 'emerald', bg: '#f0fdf4', bgDark: '#14532d', border: '#22c55e', label: 'Emerald' },
-  { value: 'violet',  bg: '#f5f3ff', bgDark: '#2e1065', border: '#a855f7', label: 'Violet'  },
-  { value: 'amber',   bg: '#fffbeb', bgDark: '#451a03', border: '#f59e0b', label: 'Amber'   },
+const NOTE_COLORS: { value: NoteColor; dot: string; bg: string; bgDark: string }[] = [
+  { value: 'yellow',  dot: '#eab308', bg: '#fefce8', bgDark: '#422006' },
+  { value: 'rose',    dot: '#f43f5e', bg: '#fff1f2', bgDark: '#4c0519' },
+  { value: 'sky',     dot: '#38bdf8', bg: '#f0f9ff', bgDark: '#0c4a6e' },
+  { value: 'emerald', dot: '#22c55e', bg: '#f0fdf4', bgDark: '#14532d' },
+  { value: 'violet',  dot: '#a855f7', bg: '#f5f3ff', bgDark: '#2e1065' },
+  { value: 'amber',   dot: '#f59e0b', bg: '#fffbeb', bgDark: '#451a03' },
 ];
+
+const LINE_COUNT = 5;
 
 interface NotesPanelProps {
   selectedRange: DateRange;
@@ -32,283 +34,178 @@ export default function NotesPanel({
   theme,
   darkMode,
 }: NotesPanelProps) {
-  const [content, setContent] = useState('');
-  const [title, setTitle] = useState('');
+  const [activeLine, setActiveLine] = useState<number | null>(null);
+  const [lineTexts, setLineTexts] = useState<string[]>(Array(LINE_COUNT).fill(''));
   const [color, setColor] = useState<NoteColor>('yellow');
   const [saved, setSaved] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
-  const [editId, setEditId] = useState<string | null>(null);
-  const textRef = useRef<HTMLTextAreaElement>(null);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const hasStart = !!selectedRange.start;
   const hasRange = hasStart && !!selectedRange.end;
 
   const rangeLabel = hasRange
-    ? `${format(selectedRange.start!, 'MMM d')} – ${format(selectedRange.end!, 'MMM d, yyyy')}`
+    ? `${format(selectedRange.start!, 'MMM d')} – ${format(selectedRange.end!, 'MMM d')}`
     : hasStart
-    ? format(selectedRange.start!, 'MMMM d, yyyy')
+    ? format(selectedRange.start!, 'MMM d, yyyy')
     : '';
 
-  const days = hasRange ? differenceInDays(selectedRange.end!, selectedRange.start!) + 1 : 1;
-
   const handleSave = () => {
-    if (!content.trim() || !selectedRange.start) return;
-
-    if (editId) {
-      onSaveNotes(notes.map(n => n.id === editId ? { ...n, content: content.trim(), title: title.trim() || rangeLabel, color } : n));
-      setEditId(null);
-    } else {
-      const newNote: Note = {
-        id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-        rangeStart: selectedRange.start.toISOString(),
-        rangeEnd: (selectedRange.end ?? selectedRange.start).toISOString(),
-        content: content.trim(),
-        color,
-        createdAt: new Date().toISOString(),
-        title: title.trim() || rangeLabel,
-      };
-      onSaveNotes([...notes, newNote]);
-    }
-
-    setContent('');
-    setTitle('');
+    const content = lineTexts.filter(Boolean).join('\n');
+    if (!content || !selectedRange.start) return;
+    const newNote: Note = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      rangeStart: selectedRange.start.toISOString(),
+      rangeEnd: (selectedRange.end ?? selectedRange.start).toISOString(),
+      content,
+      color,
+      createdAt: new Date().toISOString(),
+      title: rangeLabel,
+    };
+    onSaveNotes([...notes, newNote]);
+    setLineTexts(Array(LINE_COUNT).fill(''));
+    setActiveLine(null);
     setSaved(true);
-    setTimeout(() => setSaved(false), 2200);
+    setTimeout(() => setSaved(false), 2000);
   };
 
-  const handleEdit = (note: Note) => {
-    setEditId(note.id);
-    setContent(note.content);
-    setTitle(note.title);
-    setColor(note.color);
-    setTimeout(() => textRef.current?.focus(), 100);
-  };
+  const handleDelete = (id: string) => onSaveNotes(notes.filter(n => n.id !== id));
 
-  const handleDelete = (id: string) => {
-    onSaveNotes(notes.filter(n => n.id !== id));
-    if (editId === id) { setEditId(null); setContent(''); setTitle(''); }
-  };
-
-  const panelBg = darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-zinc-50 border-zinc-100';
-  const cardBg = darkMode ? 'bg-zinc-800' : 'bg-white';
-  const inputCls = `w-full text-sm px-3 py-2 rounded-xl border focus:outline-none focus:ring-2 transition-all resize-none ${
-    darkMode
-      ? 'bg-zinc-700 border-zinc-600 text-zinc-200 placeholder-zinc-500 focus:ring-zinc-500'
-      : 'bg-zinc-50 border-zinc-200 text-zinc-700 placeholder-zinc-400 focus:ring-zinc-300'
-  }`;
+  const bg = darkMode ? 'bg-zinc-900' : 'bg-white';
+  const border = darkMode ? 'border-zinc-800' : 'border-zinc-100';
+  const headingColor = darkMode ? 'text-zinc-400' : 'text-zinc-500';
+  const lineColor = darkMode ? '#3f3f46' : '#e5e7eb';
+  const inputText = darkMode ? 'text-zinc-300 placeholder-zinc-600' : 'text-zinc-700 placeholder-zinc-300';
 
   return (
-    <div className={`border-t ${panelBg} transition-colors duration-300`}>
-      {/* ── Section header ── */}
-      <div className="max-w-6xl mx-auto px-6 pt-4 pb-2 flex items-center gap-2">
-        <FileText size={15} style={{ color: theme.primaryColor }} />
-        <h3 className={`text-sm font-bold ${darkMode ? 'text-zinc-300' : 'text-zinc-600'}`}>
-          Notes &amp; Memos
-        </h3>
-        {notes.length > 0 && (
-          <span
-            className="ml-1 text-[10px] px-2 py-0.5 rounded-full font-semibold"
-            style={{ backgroundColor: `${theme.primaryColor}20`, color: theme.primaryColor }}
+    <div className={`flex flex-col ${bg} border-r ${border} transition-colors duration-300`}
+         style={{ width: 185, minWidth: 185, flexShrink: 0 }}>
+      <div className="p-4 flex flex-col gap-3 flex-1">
+
+        {/* ── "NOTES" heading ── */}
+        <p className={`text-[9px] font-black tracking-[0.3em] uppercase ${headingColor}`}>
+          Notes
+        </p>
+
+        {/* ── Range label (if selection) ── */}
+        <AnimatePresence>
+          {hasStart && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <p className="text-[10px] font-semibold truncate" style={{ color: theme.primaryColor }}>
+                {rangeLabel}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ── Lined notepad ── */}
+        <div className="flex flex-col gap-0 flex-1">
+          {Array.from({ length: LINE_COUNT }).map((_, i) => (
+            <div key={i} className="relative group">
+              <input
+                ref={el => { inputRefs.current[i] = el; }}
+                value={lineTexts[i]}
+                onChange={e => {
+                  const next = [...lineTexts];
+                  next[i] = e.target.value;
+                  setLineTexts(next);
+                }}
+                onFocus={() => setActiveLine(i)}
+                onBlur={() => setActiveLine(null)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && i < LINE_COUNT - 1) {
+                    inputRefs.current[i + 1]?.focus();
+                  }
+                }}
+                placeholder="tap to write..."
+                maxLength={40}
+                className={`w-full bg-transparent text-[11px] py-2 px-0 focus:outline-none transition-colors font-handwriting ${inputText}`}
+                style={{ fontFamily: "'Patrick Hand', 'Caveat', cursive" }}
+              />
+              {/* Ruled line */}
+              <div
+                className="absolute bottom-0 left-0 right-0 h-[1px] transition-colors"
+                style={{
+                  backgroundColor: activeLine === i ? theme.primaryColor : lineColor,
+                  opacity: activeLine === i ? 0.8 : 1,
+                }}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* ── Colour swatches + save ── */}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {NOTE_COLORS.map(c => (
+            <button
+              key={c.value}
+              onClick={() => setColor(c.value)}
+              title={c.value}
+              className="w-4 h-4 rounded-full transition-transform"
+              style={{
+                backgroundColor: c.dot,
+                transform: color === c.value ? 'scale(1.4)' : 'scale(1)',
+                boxShadow: color === c.value ? `0 0 0 2px white, 0 0 0 3px ${c.dot}` : 'none',
+              }}
+            />
+          ))}
+        </div>
+
+        {/* ── Save button ── */}
+        {hasStart && (
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            onClick={handleSave}
+            disabled={!lineTexts.some(Boolean)}
+            className="w-full py-1.5 rounded-lg text-[11px] font-bold text-white transition-all
+                       hover:opacity-90 hover:scale-[1.02] active:scale-[0.98]
+                       disabled:opacity-35 disabled:cursor-not-allowed"
+            style={{ backgroundColor: theme.primaryColor }}
           >
-            {notes.length}
-          </span>
+            {saved ? '✓ Saved!' : 'Save Note'}
+          </motion.button>
         )}
-        <button
-          onClick={() => setCollapsed(c => !c)}
-          className={`ml-auto p-1 rounded-lg transition-colors ${darkMode ? 'hover:bg-zinc-700 text-zinc-500' : 'hover:bg-zinc-200 text-zinc-400'}`}
-          aria-label={collapsed ? 'Expand notes' : 'Collapse notes'}
-        >
-          {collapsed ? <ChevronDown size={15} /> : <ChevronUp size={15} />}
-        </button>
       </div>
 
-      <AnimatePresence>
-        {!collapsed && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.28, ease: 'easeInOut' }}
-            className="overflow-hidden"
-          >
-            <div className="max-w-6xl mx-auto px-6 pb-6 grid grid-cols-1 lg:grid-cols-2 gap-5">
-
-              {/* ── Editor ── */}
-              <AnimatePresence mode="wait">
-                {hasStart ? (
-                  <motion.div
-                    key="editor"
-                    initial={{ opacity: 0, y: 18 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -18 }}
-                    className={`rounded-2xl p-4 shadow-sm border ${darkMode ? 'bg-zinc-800 border-zinc-700' : 'bg-white border-zinc-100'}`}
+      {/* ── Saved notes (scrollable mini cards) ── */}
+      {notes.length > 0 && (
+        <div className={`border-t ${border} p-3 max-h-36 overflow-y-auto scrollbar-thin flex flex-col gap-2`}>
+          <p className={`text-[8px] font-black tracking-[0.3em] uppercase ${headingColor}`}>Saved</p>
+          <AnimatePresence initial={false}>
+            {[...notes].reverse().map(note => {
+              const c = NOTE_COLORS.find(x => x.value === note.color) ?? NOTE_COLORS[0];
+              return (
+                <motion.div
+                  key={note.id}
+                  layout
+                  initial={{ opacity: 0, x: 14 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -14, height: 0 }}
+                  className="rounded-md p-2 relative group flex-shrink-0"
+                  style={{ backgroundColor: darkMode ? c.bgDark : c.bg, borderLeft: `2.5px solid ${c.dot}` }}
+                >
+                  <p className="text-[9px] font-bold truncate" style={{ color: c.dot }}>{note.title}</p>
+                  <p className={`text-[9px] mt-0.5 line-clamp-2 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                    {note.content}
+                  </p>
+                  <button
+                    onClick={() => handleDelete(note.id)}
+                    className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-500 transition-opacity"
+                    aria-label="Delete"
                   >
-                    {/* Header */}
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <p className={`text-[10px] font-medium ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
-                          {days} day{days !== 1 ? 's' : ''}
-                        </p>
-                        <p className="text-sm font-bold mt-0.5" style={{ color: theme.primaryColor }}>
-                          {rangeLabel}
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => { onClearSelection(); setEditId(null); setContent(''); setTitle(''); }}
-                        className={`p-1.5 rounded-lg transition-colors ${darkMode ? 'hover:bg-zinc-700 text-zinc-500' : 'hover:bg-zinc-100 text-zinc-400'}`}
-                        aria-label="Clear selection"
-                      >
-                        <X size={13} />
-                      </button>
-                    </div>
-
-                    {/* Title */}
-                    <input
-                      type="text"
-                      placeholder="Note title (optional)"
-                      value={title}
-                      onChange={e => setTitle(e.target.value)}
-                      className={`${inputCls} mb-2 font-medium`}
-                    />
-
-                    {/* Textarea */}
-                    <textarea
-                      ref={textRef}
-                      placeholder={`Jot something down for ${rangeLabel}…`}
-                      value={content}
-                      onChange={e => setContent(e.target.value)}
-                      rows={4}
-                      className={inputCls}
-                    />
-
-                    {/* Footer */}
-                    <div className="flex items-center justify-between mt-3">
-                      {/* Color swatches */}
-                      <div className="flex gap-1.5 flex-wrap">
-                        {NOTE_COLORS.map(c => (
-                          <button
-                            key={c.value}
-                            onClick={() => setColor(c.value)}
-                            title={c.label}
-                            className="w-5 h-5 rounded-full transition-transform"
-                            style={{
-                              backgroundColor: darkMode ? c.bgDark : c.bg,
-                              border: `2.5px solid ${c.border}`,
-                              transform: color === c.value ? 'scale(1.3)' : 'scale(1)',
-                              boxShadow: color === c.value ? `0 0 0 2px ${c.border}40` : 'none',
-                            }}
-                          />
-                        ))}
-                      </div>
-
-                      {/* Character count + save */}
-                      <div className="flex items-center gap-2">
-                        <span className={`text-[10px] tabular-nums ${darkMode ? 'text-zinc-600' : 'text-zinc-300'}`}>
-                          {content.length}/500
-                        </span>
-                        <button
-                          onClick={handleSave}
-                          disabled={!content.trim()}
-                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white
-                                     transition-all hover:opacity-90 hover:scale-105 active:scale-95
-                                     disabled:opacity-35 disabled:cursor-not-allowed disabled:scale-100"
-                          style={{ backgroundColor: theme.primaryColor }}
-                        >
-                          {saved ? (
-                            <motion.span
-                              initial={{ scale: 0.6 }}
-                              animate={{ scale: 1 }}
-                              className="flex items-center gap-1"
-                            >
-                              ✓ Saved!
-                            </motion.span>
-                          ) : (
-                            <>
-                              <Save size={12} />
-                              {editId ? 'Update' : 'Save'}
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="placeholder"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className={`rounded-2xl p-6 flex flex-col items-center justify-center text-center border-2 border-dashed ${
-                      darkMode ? 'border-zinc-700 text-zinc-600' : 'border-zinc-200 text-zinc-400'
-                    }`}
-                  >
-                    <Plus size={20} className="mb-2 opacity-40" />
-                    <p className="text-sm">Select a date to add a note</p>
-                    <p className="text-[11px] mt-1 opacity-60">Or select a range for a trip / event</p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* ── Saved notes list ── */}
-              <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1 scrollbar-thin">
-                <AnimatePresence initial={false}>
-                  {notes.length === 0 ? (
-                    <motion.div
-                      key="empty"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 0.45 }}
-                      className={`text-sm text-center py-10 ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
-                    >
-                      No notes saved yet
-                    </motion.div>
-                  ) : (
-                    [...notes].reverse().map(note => {
-                      const c = NOTE_COLORS.find(x => x.value === note.color) ?? NOTE_COLORS[0];
-                      return (
-                        <motion.div
-                          key={note.id}
-                          layout
-                          initial={{ opacity: 0, x: 24 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -24, height: 0, marginBottom: 0, paddingBottom: 0 }}
-                          transition={{ duration: 0.22 }}
-                          className="rounded-xl p-3 relative group cursor-pointer"
-                          style={{
-                            backgroundColor: darkMode ? c.bgDark : c.bg,
-                            borderLeft: `3px solid ${c.border}`,
-                          }}
-                          onClick={() => handleEdit(note)}
-                        >
-                          <div className="flex justify-between items-start gap-2">
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs font-bold truncate" style={{ color: c.border }}>
-                                {note.title}
-                              </p>
-                              <p className={`text-xs mt-0.5 line-clamp-2 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                                {note.content}
-                              </p>
-                              <p className={`text-[9px] mt-1 opacity-50 ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
-                                {format(new Date(note.createdAt), 'MMM d, yyyy · h:mm a')}
-                              </p>
-                            </div>
-                            <button
-                              onClick={e => { e.stopPropagation(); handleDelete(note.id); }}
-                              className="flex-shrink-0 opacity-0 group-hover:opacity-100 p-1.5 rounded-lg
-                                         hover:bg-red-100 dark:hover:bg-red-900/40 text-red-400 transition-all"
-                              aria-label="Delete note"
-                            >
-                              <Trash2 size={11} />
-                            </button>
-                          </div>
-                        </motion.div>
-                      );
-                    })
-                  )}
-                </AnimatePresence>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                    <Trash2 size={9}/>
+                  </button>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+        </div>
+      )}
     </div>
   );
 }
