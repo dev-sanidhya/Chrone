@@ -140,8 +140,8 @@ export default function CalendarGrid({
               >
                 <span className="font-semibold" style={{ color: theme.primaryColor }}>
                   {daysSelected
-                    ? `${daysSelected} day${daysSelected!==1?'s':''} · ${format(selectedRange.start,'MMM d')} → ${format(selectedRange.end!,'MMM d, yyyy')}`
-                    : `From ${format(selectedRange.start,'MMM d, yyyy')}`}
+                    ? `${daysSelected} day${daysSelected!==1?'s':''} story · ${format(selectedRange.start,'MMM d')} → ${format(selectedRange.end!,'MMM d, yyyy')}`
+                    : `Pinned on ${format(selectedRange.start,'MMM d, yyyy')}`}
                 </span>
                 <button onClick={onClearSelection} style={{ color: theme.primaryColor }} aria-label="Clear selection">
                   <X size={11}/>
@@ -219,7 +219,7 @@ export default function CalendarGrid({
 
         {/* ── Double-tap hint ── */}
         <p className={`text-center text-[8px] ${dimText} mt-0`}>
-          Double-tap a date to add a sticker
+          Double-tap a date to pin a sticker
         </p>
       </div>
     </div>

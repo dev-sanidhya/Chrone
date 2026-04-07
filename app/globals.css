@@ -29,6 +29,7 @@ body {
   color: var(--foreground);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
 }
 
 /* ─── Particle fall animation ───────────────────────────────── */
@@ -89,6 +90,10 @@ button:focus-visible {
 /* ─── Paper texture on calendar body ───────────────────────── */
 .paper-texture {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+}
+
+.calendar-card {
+  transition: transform 180ms ease, box-shadow 240ms ease;
 }
 
 /* ─── 3-D card depth on hover (desktop) ─────────────────────── */

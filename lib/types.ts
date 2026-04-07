@@ -11,9 +11,12 @@ export interface Note {
   color: NoteColor;
   createdAt: string;
   title: string;
+  category?: NoteCategory;
 }
 
 export type NoteColor = 'yellow' | 'rose' | 'sky' | 'emerald' | 'violet' | 'amber';
+export type NoteCategory = 'memory' | 'trip' | 'focus' | 'celebration' | 'personal';
+export type MonthMemoMap = Record<string, string>;
 
 export type Season = 'winter' | 'spring' | 'summer' | 'fall';
 export type ParticleType = 'snow' | 'petals' | 'sparkles' | 'leaves';

@@ -6,13 +6,14 @@ interface Props {
   season: Season;
   month: number;
   primaryColor: string;
+  fit?: 'cover' | 'contain';
 }
 
 /* ─────────────────────── WINTER ─────────────────────── */
-function WinterScene({ month }: { month: number }) {
+function WinterScene({ month, fit = 'cover' }: { month: number; fit?: 'cover' | 'contain' }) {
   const isDecember = month === 11;
   return (
-    <svg viewBox="0 0 600 340" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice">
+    <svg viewBox="0 0 600 340" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 w-full h-full" preserveAspectRatio={fit === 'contain' ? 'xMidYMid meet' : 'xMidYMid slice'}>
       <defs>
         <linearGradient id="w-sky" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%"   stopColor="#030712"/>
@@ -92,10 +93,10 @@ function WinterScene({ month }: { month: number }) {
 }
 
 /* ─────────────────────── SPRING ─────────────────────── */
-function SpringScene({ month }: { month: number }) {
+function SpringScene({ month, fit = 'cover' }: { month: number; fit?: 'cover' | 'contain' }) {
   const isApril = month === 3;
   return (
-    <svg viewBox="0 0 600 340" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice">
+    <svg viewBox="0 0 600 340" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 w-full h-full" preserveAspectRatio={fit === 'contain' ? 'xMidYMid meet' : 'xMidYMid slice'}>
       <defs>
         <linearGradient id="sp-sky" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%"   stopColor={isApril ? "#4a1942" : "#1a3a5c"}/>
@@ -187,10 +188,10 @@ function SpringScene({ month }: { month: number }) {
 }
 
 /* ─────────────────────── SUMMER ─────────────────────── */
-function SummerScene({ month }: { month: number }) {
+function SummerScene({ month, fit = 'cover' }: { month: number; fit?: 'cover' | 'contain' }) {
   const isJuly = month === 6;
   return (
-    <svg viewBox="0 0 600 340" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice">
+    <svg viewBox="0 0 600 340" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 w-full h-full" preserveAspectRatio={fit === 'contain' ? 'xMidYMid meet' : 'xMidYMid slice'}>
       <defs>
         <linearGradient id="su-sky" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%"   stopColor={isJuly?"#0d1b4a":"#1a237e"}/>
@@ -302,10 +303,10 @@ function SummerScene({ month }: { month: number }) {
 }
 
 /* ─────────────────────── FALL ─────────────────────── */
-function FallScene({ month }: { month: number }) {
+function FallScene({ month, fit = 'cover' }: { month: number; fit?: 'cover' | 'contain' }) {
   const isOctober = month === 9;
   return (
-    <svg viewBox="0 0 600 340" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice">
+    <svg viewBox="0 0 600 340" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 w-full h-full" preserveAspectRatio={fit === 'contain' ? 'xMidYMid meet' : 'xMidYMid slice'}>
       <defs>
         <linearGradient id="fa-sky" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%"   stopColor={isOctober?"#1a0536":"#4a1000"}/>
@@ -391,9 +392,9 @@ function FallScene({ month }: { month: number }) {
   );
 }
 
-export default function SeasonScene({ season, month, primaryColor }: Props) {
-  if (season === 'winter') return <WinterScene month={month} />;
-  if (season === 'spring') return <SpringScene month={month} />;
-  if (season === 'summer') return <SummerScene month={month} />;
-  return <FallScene month={month} />;
+export default function SeasonScene({ season, month, primaryColor, fit = 'cover' }: Props) {
+  if (season === 'winter') return <WinterScene month={month} fit={fit} />;
+  if (season === 'spring') return <SpringScene month={month} fit={fit} />;
+  if (season === 'summer') return <SummerScene month={month} fit={fit} />;
+  return <FallScene month={month} fit={fit} />;
 }
