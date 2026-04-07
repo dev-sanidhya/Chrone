@@ -189,15 +189,15 @@ export default function NotesPanel({
           />
 
           <div className="mt-4 flex items-center justify-between gap-3">
-            <div className="flex gap-1.5">
+            <div className="flex gap-2">
               {NOTE_COLORS.map((entry) => (
                 <button
                   key={entry.value}
                   onClick={() => setColor(entry.value)}
-                  className="h-4 w-4 rounded-full transition-transform"
+                  className="h-3.5 w-3.5 rounded-full transition-transform"
                   style={{
                     backgroundColor: entry.dot,
-                    transform: color === entry.value ? 'scale(1.35)' : 'scale(1)',
+                    transform: color === entry.value ? 'scale(1.22)' : 'scale(1)',
                     boxShadow: color === entry.value ? `0 0 0 2px white, 0 0 0 4px ${entry.dot}` : 'none',
                   }}
                 />

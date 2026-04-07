@@ -199,7 +199,7 @@ export default function WallCalendar() {
 
   return (
     <div
-      className={`min-h-screen flex items-start md:items-center justify-center transition-colors duration-500 ${outerBg} p-0 md:p-6`}
+      className={`min-h-screen flex items-start justify-center transition-colors duration-500 ${outerBg} p-0 md:p-6`}
       style={{ '--theme-primary': theme.primaryColor } as React.CSSProperties}
     >
       <Confetti trigger={confettiTrigger} />
@@ -305,7 +305,7 @@ export default function WallCalendar() {
               className="w-full"
             >
               <div
-                className={`calendar-card flex w-full flex-col overflow-hidden rounded-none sm:rounded-[2rem] paper-texture ${darkMode ? 'bg-zinc-900' : 'bg-[#fdf9f1]'}`}
+                className={`calendar-card flex w-full flex-col overflow-visible rounded-none sm:rounded-[2rem] paper-texture ${darkMode ? 'bg-zinc-900' : 'bg-[#fdf9f1]'}`}
                 style={{ boxShadow: cardShadow }}
               >
                 <BindingRings primaryColor={theme.primaryColor} />
