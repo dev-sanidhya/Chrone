@@ -16,16 +16,16 @@ interface GalleryPrintProps {
 export default function GalleryPrint({ theme, currentDate, artifact }: GalleryPrintProps) {
   return (
     <div className="relative h-full min-h-[160px]">
-      <div className="absolute -left-1 top-3 h-12 w-8 rotate-[-8deg] rounded-sm bg-stone-100/90 shadow-[0_12px_22px_rgba(0,0,0,0.14)] sm:h-14 sm:w-10" />
-      <div className="absolute right-4 top-0 h-10 w-16 rotate-[6deg] rounded-sm bg-stone-100/75 shadow-[0_12px_22px_rgba(0,0,0,0.12)] sm:right-7 sm:h-12 sm:w-20" />
+      <div className="absolute -left-1 top-2 h-8 w-6 rotate-[-8deg] rounded-sm bg-stone-100/90 shadow-[0_8px_14px_rgba(0,0,0,0.12)]" />
+      <div className="absolute right-3 top-0 h-7 w-12 rotate-[6deg] rounded-sm bg-stone-100/75 shadow-[0_8px_14px_rgba(0,0,0,0.1)]" />
 
       <motion.div
         initial={{ opacity: 0, y: 14, rotate: -0.9 }}
         animate={{ opacity: 1, y: 0, rotate: -0.9 }}
         transition={{ duration: 0.38, ease: 'easeOut' }}
-        className="relative h-full rounded-[1.5rem] bg-[#f6efe4] p-3 shadow-[0_28px_55px_rgba(15,23,42,0.22)] sm:rounded-[2rem] sm:p-4"
+        className="relative h-full rounded-[1.2rem] bg-[#f6efe4] p-2 shadow-[0_18px_36px_rgba(15,23,42,0.18)]"
       >
-        <div className="flex h-full flex-col rounded-[1.25rem] border border-black/10 bg-[#fffdfa] p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] sm:rounded-[1.6rem] sm:p-3">
+        <div className="flex h-full flex-col rounded-[1rem] border border-black/10 bg-[#fffdfa] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
           <div
             className="relative flex-1 overflow-hidden rounded-[1rem] border border-black/8 sm:rounded-[1.2rem]"
             style={{
@@ -63,21 +63,18 @@ export default function GalleryPrint({ theme, currentDate, artifact }: GalleryPr
             </div>
           </div>
 
-          <div className="grid shrink-0 gap-2.5 border-t border-dashed border-stone-300 px-1 pb-1 pt-3 text-stone-700 md:grid-cols-[1fr_auto] md:items-end">
-            <div>
-              <p className="text-[9px] uppercase tracking-[0.28em] text-stone-500 sm:text-[10px] sm:tracking-[0.34em]">
-                {artifact.location}
-              </p>
-              <h2 className="mt-1 text-[1.45rem] font-black uppercase leading-[0.92] text-stone-900 sm:text-[1.85rem]">
+          <div className="flex shrink-0 items-center justify-between gap-2 border-t border-dashed border-stone-300 px-1 pb-1 pt-2 text-stone-700">
+            <div className="min-w-0">
+              <p className="text-[8px] uppercase tracking-[0.24em] text-stone-400">{artifact.location}</p>
+              <h2 className="mt-0.5 text-[0.95rem] font-black uppercase leading-tight text-stone-900 truncate">
                 {artifact.title}
               </h2>
-              <p className="mt-1.5 text-[13px] italic leading-relaxed text-stone-600 sm:text-sm" style={{ fontFamily: 'var(--font-playfair), serif' }}>
+              <p className="mt-0.5 text-[10px] italic leading-snug text-stone-500 line-clamp-1" style={{ fontFamily: 'var(--font-playfair), serif' }}>
                 {artifact.caption}
               </p>
             </div>
-
-            <div className="rounded-2xl bg-stone-100 px-3 py-2 text-right text-[9px] font-medium uppercase tracking-[0.16em] text-stone-500 sm:text-[10px] sm:tracking-[0.18em]">
-              Mounted Print
+            <div className="flex-shrink-0 rounded-xl bg-stone-100 px-2 py-1 text-[8px] font-medium uppercase tracking-[0.14em] text-stone-400">
+              Print
             </div>
           </div>
         </div>
