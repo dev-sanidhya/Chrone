@@ -8,12 +8,12 @@ import type { DateRange, Note, NoteCategory, NoteColor, MonthTheme } from '@/lib
 import { CATEGORY_META } from '@/lib/monthArtifacts';
 
 const NOTE_COLORS: { value: NoteColor; dot: string; bg: string; bgDark: string }[] = [
-  { value: 'yellow', dot: '#eab308', bg: '#fefce8', bgDark: '#422006' },
-  { value: 'rose', dot: '#f43f5e', bg: '#fff1f2', bgDark: '#4c0519' },
-  { value: 'sky', dot: '#38bdf8', bg: '#f0f9ff', bgDark: '#0c4a6e' },
+  { value: 'yellow',  dot: '#eab308', bg: '#fefce8', bgDark: '#422006' },
+  { value: 'rose',    dot: '#f43f5e', bg: '#fff1f2', bgDark: '#4c0519' },
+  { value: 'sky',     dot: '#38bdf8', bg: '#f0f9ff', bgDark: '#0c4a6e' },
   { value: 'emerald', dot: '#22c55e', bg: '#f0fdf4', bgDark: '#14532d' },
-  { value: 'violet', dot: '#a855f7', bg: '#f5f3ff', bgDark: '#2e1065' },
-  { value: 'amber', dot: '#f59e0b', bg: '#fffbeb', bgDark: '#451a03' },
+  { value: 'violet',  dot: '#a855f7', bg: '#f5f3ff', bgDark: '#2e1065' },
+  { value: 'amber',   dot: '#f59e0b', bg: '#fffbeb', bgDark: '#451a03' },
 ];
 
 const CATEGORY_ORDER: NoteCategory[] = ['memory', 'trip', 'focus', 'celebration', 'personal'];
@@ -43,19 +43,17 @@ export default function NotesPanel({
   darkMode,
   isMobile = false,
 }: NotesPanelProps) {
-  const [memoDraft, setMemoDraft] = useState(monthMemo);
-  const [noteDraft, setNoteDraft] = useState('');
-  const [category, setCategory] = useState<NoteCategory>('memory');
-  const [color, setColor] = useState<NoteColor>('yellow');
+  const [memoDraft,  setMemoDraft]  = useState(monthMemo);
+  const [noteDraft,  setNoteDraft]  = useState('');
+  const [category,   setCategory]   = useState<NoteCategory>('memory');
+  const [color,      setColor]      = useState<NoteColor>('yellow');
   const [savedState, setSavedState] = useState<'memo' | 'note' | null>(null);
 
-  useEffect(() => {
-    setMemoDraft(monthMemo);
-  }, [monthMemo, currentDate]);
+  useEffect(() => { setMemoDraft(monthMemo); }, [monthMemo, currentDate]);
 
-  const hasSelection = !!selectedRange.start;
+  const hasSelection   = !!selectedRange.start;
   const selectionStart = selectedRange.start;
-  const selectionEnd = selectedRange.end ?? selectedRange.start;
+  const selectionEnd   = selectedRange.end ?? selectedRange.start;
   const selectionLabel = selectionStart && selectionEnd
     ? selectionStart.getTime() === selectionEnd.getTime()
       ? format(selectionStart, 'MMM d, yyyy')
@@ -65,9 +63,9 @@ export default function NotesPanel({
   const currentMonthNotes = useMemo(() => {
     const monthKey = format(currentDate, 'yyyy-MM');
     return notes
-      .filter((note) => note.rangeStart.startsWith(monthKey))
+      .filter(n => n.rangeStart.startsWith(monthKey))
       .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
-  }, [currentDate, isMobile, notes]);
+  }, [currentDate, notes]);
 
   const saveMemo = () => {
     onSaveMonthMemo(memoDraft);
@@ -77,98 +75,110 @@ export default function NotesPanel({
 
   const saveSelectionNote = () => {
     if (!selectionStart || !selectionEnd || !noteDraft.trim()) return;
-
     const next: Note = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
       rangeStart: selectionStart.toISOString(),
-      rangeEnd: selectionEnd.toISOString(),
-      content: noteDraft.trim(),
+      rangeEnd:   selectionEnd.toISOString(),
+      content:    noteDraft.trim(),
       color,
-      createdAt: new Date().toISOString(),
-      title: selectionLabel,
+      createdAt:  new Date().toISOString(),
+      title:      selectionLabel,
       category,
     };
-
     onSaveNotes([...notes, next]);
     setNoteDraft('');
     setSavedState('note');
     setTimeout(() => setSavedState(null), 1400);
   };
 
-  const deleteNote = (id: string) => onSaveNotes(notes.filter((note) => note.id !== id));
+  const deleteNote = (id: string) => onSaveNotes(notes.filter(n => n.id !== id));
 
   const shell = darkMode ? 'bg-zinc-900' : 'bg-[#fffdf8]';
-  const card = darkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-black/10';
+  const card  = darkMode ? 'bg-zinc-950 border-zinc-800' : 'bg-white border-black/8';
   const muted = darkMode ? 'text-zinc-400' : 'text-zinc-500';
-  const text = darkMode ? 'text-zinc-200' : 'text-zinc-700';
+  const txt   = darkMode ? 'text-zinc-200' : 'text-zinc-700';
+
+  /* ─── compact = desktop non-mobile ─────────── */
+  const compact = !isMobile;
 
   return (
     <aside
-      className={`flex-shrink-0 min-h-0 overflow-y-auto scrollbar-thin ${isMobile ? 'border-t' : 'border-r'} ${darkMode ? 'border-zinc-800' : 'border-black/5'} ${shell}`}
-      style={isMobile ? undefined : { width: 300, minWidth: 300 }}
+      className={`flex-shrink-0 min-h-0 flex flex-col ${isMobile ? 'border-t overflow-y-auto' : 'border-r overflow-hidden'} ${darkMode ? 'border-zinc-800' : 'border-black/5'} ${shell}`}
+      style={isMobile ? undefined : { width: 292, minWidth: 292 }}
     >
-      <div className={`grid gap-3 ${isMobile ? 'p-4' : 'p-4'}`}>
-        <section className={`rounded-[1.7rem] border p-4 shadow-[0_20px_32px_rgba(15,23,42,0.08)] ${card}`}>
+      {/* ════ scrollable content area ════ */}
+      <div className={`flex flex-col gap-2 ${compact ? 'p-3' : 'p-4'} flex-1 min-h-0 ${compact ? 'overflow-y-auto scrollbar-thin' : ''}`}>
+
+        {/* ── Month Memo ── */}
+        <section className={`rounded-xl border ${compact ? 'p-2.5' : 'p-4'} shadow-[0_8px_18px_rgba(15,23,42,0.07)] flex-shrink-0 ${card}`}>
           <div className="flex items-center justify-between">
-            <p className={`text-[10px] font-black uppercase tracking-[0.32em] ${muted}`}>Month Memo</p>
-            <Pin size={14} style={{ color: theme.primaryColor }} />
+            <p className={`text-[9px] font-black uppercase tracking-[0.3em] ${muted}`}>Month Memo</p>
+            <Pin size={11} style={{ color: theme.primaryColor }} />
           </div>
-          <p className={`mt-2 text-sm ${text}`}>A permanent margin note for {format(currentDate, 'MMMM yyyy')}.</p>
+
           <textarea
             value={memoDraft}
-            onChange={(event) => setMemoDraft(event.target.value)}
-            rows={isMobile ? 6 : 5}
-            placeholder="Write a monthly headline, reminder, or personal theme..."
-            className={`mt-4 w-full resize-none rounded-[1.2rem] border px-4 py-3 text-sm leading-relaxed focus:outline-none ${darkMode ? 'border-zinc-800 bg-zinc-900 text-zinc-200 placeholder-zinc-600' : 'border-black/10 bg-[#fffdf8] text-zinc-700 placeholder-zinc-400'}`}
+            onChange={e => setMemoDraft(e.target.value)}
+            rows={compact ? 2 : 5}
+            placeholder={compact ? 'Monthly headline or theme…' : 'Write a monthly headline, reminder, or personal theme…'}
+            className={`mt-2 w-full resize-none rounded-lg border ${compact ? 'px-2.5 py-1.5 text-[11px]' : 'px-4 py-3 text-sm'} leading-relaxed focus:outline-none ${
+              darkMode
+                ? 'border-zinc-800 bg-zinc-900 text-zinc-200 placeholder-zinc-600'
+                : 'border-black/8 bg-[#fffdf8] text-zinc-700 placeholder-zinc-400'
+            }`}
           />
-          <div className={`mt-3 flex ${isMobile ? 'flex-col items-stretch gap-2.5' : 'items-center justify-between'}`}>
-            <span className={`text-[10px] font-bold uppercase tracking-[0.2em] ${muted}`}>Always visible</span>
+
+          <div className="mt-2 flex items-center justify-between gap-2">
+            <span className={`text-[9px] font-semibold uppercase tracking-[0.18em] ${muted}`}>Always visible</span>
             <button
               onClick={saveMemo}
-              className={`rounded-full px-4 py-2 text-[10px] font-bold uppercase tracking-[0.22em] text-white ${isMobile ? 'w-full' : ''}`}
+              className="rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-[0.2em] text-white"
               style={{ backgroundColor: theme.primaryColor }}
             >
-              {savedState === 'memo' ? 'Saved' : 'Save memo'}
+              {savedState === 'memo' ? '✓ Saved' : 'Save memo'}
             </button>
           </div>
         </section>
 
-        <section className={`rounded-[1.7rem] border p-4 shadow-[0_20px_32px_rgba(15,23,42,0.08)] ${card}`}>
+        {/* ── Selection Note ── */}
+        <section className={`rounded-xl border ${compact ? 'p-2.5' : 'p-4'} shadow-[0_8px_18px_rgba(15,23,42,0.07)] flex-shrink-0 ${card}`}>
           <div className="flex items-center justify-between">
-            <p className={`text-[10px] font-black uppercase tracking-[0.32em] ${muted}`}>Selection Note</p>
+            <p className={`text-[9px] font-black uppercase tracking-[0.3em] ${muted}`}>Selection Note</p>
             {hasSelection && (
-              <button
-                onClick={onClearSelection}
-                className={`text-[10px] font-bold uppercase tracking-[0.22em] ${muted}`}
-              >
+              <button onClick={onClearSelection} className={`text-[9px] font-bold uppercase tracking-[0.2em] ${muted} hover:text-red-400 transition-colors`}>
                 Clear
               </button>
             )}
           </div>
 
-          <div className={`mt-4 rounded-[1.2rem] border px-4 py-3 ${darkMode ? 'border-zinc-800 bg-zinc-900' : 'border-black/10 bg-[#fffdf8]'}`}>
+          {/* Date label */}
+          <AnimatePresence mode="wait">
             {hasSelection ? (
-              <>
-                <p className="text-sm font-semibold" style={{ color: theme.primaryColor }}>
-                  {selectionLabel}
-                </p>
-                <p className={`mt-2 text-[11px] ${muted}`}>
-                  {selectedRange.end ? 'Range selected' : 'Single date selected'}
-                </p>
-              </>
+              <motion.p
+                key="sel"
+                initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                className={`mt-1.5 text-[11px] font-semibold truncate`}
+                style={{ color: theme.primaryColor }}
+              >
+                {selectionLabel}
+              </motion.p>
             ) : (
-              <p className={`text-sm ${muted}`}>Select a date or range to attach a note.</p>
+              <motion.p key="hint" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className={`mt-1.5 text-[11px] ${muted}`}>
+                Tap a date on the grid to begin
+              </motion.p>
             )}
-          </div>
+          </AnimatePresence>
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            {CATEGORY_ORDER.map((item) => {
+          {/* Category chips — single scrolling row */}
+          <div className="mt-2 flex gap-1 flex-wrap">
+            {CATEGORY_ORDER.map(item => {
               const active = category === item;
               return (
                 <button
                   key={item}
                   onClick={() => setCategory(item)}
-                  className={`rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] ${darkMode ? 'border-zinc-800' : 'border-black/10'}`}
+                  className={`rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.12em] transition-colors ${darkMode ? 'border-zinc-800' : 'border-black/8'}`}
                   style={{
                     backgroundColor: active ? `${theme.primaryColor}18` : undefined,
                     color: active ? theme.primaryColor : undefined,
@@ -182,107 +192,100 @@ export default function NotesPanel({
 
           <textarea
             value={noteDraft}
-            onChange={(event) => setNoteDraft(event.target.value)}
-            rows={isMobile ? 5 : 4}
-            placeholder="Write what happened, what matters, or what you want to remember..."
-            className={`mt-4 w-full resize-none rounded-[1.2rem] border px-4 py-3 text-sm leading-relaxed focus:outline-none ${darkMode ? 'border-zinc-800 bg-zinc-900 text-zinc-200 placeholder-zinc-600' : 'border-black/10 bg-[#fffdf8] text-zinc-700 placeholder-zinc-400'}`}
+            onChange={e => setNoteDraft(e.target.value)}
+            rows={compact ? 2 : 4}
+            placeholder="What happened, what mattered…"
+            className={`mt-2 w-full resize-none rounded-lg border ${compact ? 'px-2.5 py-1.5 text-[11px]' : 'px-4 py-3 text-sm'} leading-relaxed focus:outline-none ${
+              darkMode
+                ? 'border-zinc-800 bg-zinc-900 text-zinc-200 placeholder-zinc-600'
+                : 'border-black/8 bg-[#fffdf8] text-zinc-700 placeholder-zinc-400'
+            }`}
           />
 
-          <div className={`mt-4 flex gap-3 ${isMobile ? 'flex-col items-stretch' : 'items-center justify-between'}`}>
-            <div className={`flex ${isMobile ? 'justify-center gap-3' : 'gap-2'}`}>
-              {NOTE_COLORS.map((entry) => (
+          <div className="mt-2 flex items-center justify-between gap-2">
+            {/* Colour swatches */}
+            <div className="flex gap-1.5">
+              {NOTE_COLORS.map(entry => (
                 <button
                   key={entry.value}
                   onClick={() => setColor(entry.value)}
-                  className={`${isMobile ? 'h-4 w-4' : 'h-3.5 w-3.5'} rounded-full transition-transform`}
+                  className="h-3 w-3 rounded-full transition-transform"
                   style={{
                     backgroundColor: entry.dot,
-                    transform: color === entry.value ? 'scale(1.22)' : 'scale(1)',
-                    boxShadow: color === entry.value ? `0 0 0 2px white, 0 0 0 4px ${entry.dot}` : 'none',
+                    transform: color === entry.value ? 'scale(1.3)' : 'scale(1)',
+                    boxShadow: color === entry.value ? `0 0 0 1.5px white, 0 0 0 3px ${entry.dot}` : 'none',
                   }}
                 />
               ))}
             </div>
-
             <button
               onClick={saveSelectionNote}
               disabled={!hasSelection || !noteDraft.trim()}
-              className={`rounded-full px-4 py-2 text-[10px] font-bold uppercase tracking-[0.22em] text-white disabled:opacity-35 ${isMobile ? 'w-full' : ''}`}
+              className="rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-[0.2em] text-white disabled:opacity-35"
               style={{ backgroundColor: theme.primaryColor }}
             >
-              {savedState === 'note' ? 'Saved' : 'Save note'}
+              {savedState === 'note' ? '✓ Saved' : 'Save note'}
             </button>
           </div>
         </section>
-      </div>
 
-      <div className={`${isMobile ? '' : 'border-t'} ${darkMode ? 'border-zinc-800' : 'border-black/5'} ${isMobile ? 'px-4 pb-4 pt-0' : 'px-5 pb-5 pt-4'}`}>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className={`text-[10px] font-black uppercase tracking-[0.32em] ${muted}`}>Memory Shelf</p>
-            <p className={`mt-1 text-sm ${text}`}>Recent saved notes for this month.</p>
+        {/* ── Memory Shelf ── */}
+        <section className={`flex-shrink-0 border-t ${darkMode ? 'border-zinc-800' : 'border-black/5'} ${compact ? 'pt-2 pb-1' : 'pt-4 pb-4 px-1'}`}>
+          <div className="flex items-center justify-between mb-2">
+            <p className={`text-[9px] font-black uppercase tracking-[0.3em] ${muted}`}>Memory Shelf</p>
+            <Bookmark size={11} style={{ color: theme.primaryColor }} />
           </div>
-          <Bookmark size={14} style={{ color: theme.primaryColor }} />
-        </div>
 
-        <div className="mt-4 flex flex-col gap-3">
-          <AnimatePresence initial={false}>
-            {currentMonthNotes.length > 0 ? (
-              currentMonthNotes.map((note) => {
-                const colorMeta = NOTE_COLORS.find((entry) => entry.value === note.color) ?? NOTE_COLORS[0];
-                const categoryLabel = CATEGORY_META[note.category ?? 'memory'].short;
-                return (
-                  <motion.div
-                    key={note.id}
-                    layout
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10, height: 0 }}
-                    className="rounded-[1.2rem] border p-4 shadow-[0_14px_24px_rgba(15,23,42,0.08)]"
-                    style={{
-                      backgroundColor: darkMode ? colorMeta.bgDark : colorMeta.bg,
-                      borderColor: `${colorMeta.dot}55`,
-                    }}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <div className="flex flex-wrap gap-1.5">
-                          <span
-                            className="rounded-full px-2 py-1 text-[9px] font-bold uppercase tracking-[0.16em]"
-                            style={{ backgroundColor: `${colorMeta.dot}22`, color: colorMeta.dot }}
-                          >
-                            {categoryLabel}
-                          </span>
-                          <span className={`rounded-full px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] ${muted}`}>
-                            {format(new Date(note.rangeStart), 'MMM d')}
-                            {note.rangeEnd !== note.rangeStart ? ` → ${format(new Date(note.rangeEnd), 'MMM d')}` : ''}
-                          </span>
+          <div className="flex flex-col gap-2">
+            <AnimatePresence initial={false}>
+              {currentMonthNotes.length > 0 ? (
+                currentMonthNotes.map(note => {
+                  const cm = NOTE_COLORS.find(e => e.value === note.color) ?? NOTE_COLORS[0];
+                  const catLabel = CATEGORY_META[note.category ?? 'memory'].short;
+                  return (
+                    <motion.div
+                      key={note.id}
+                      layout
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8, height: 0 }}
+                      className={`rounded-xl border ${compact ? 'p-2.5' : 'p-3'}`}
+                      style={{ backgroundColor: darkMode ? cm.bgDark : cm.bg, borderColor: `${cm.dot}44` }}
+                    >
+                      <div className="flex items-start justify-between gap-1">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1 flex-wrap">
+                            <span className="rounded-full px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-[0.12em]"
+                              style={{ backgroundColor: `${cm.dot}22`, color: cm.dot }}>
+                              {catLabel}
+                            </span>
+                            <span className={`text-[8px] font-semibold uppercase tracking-[0.1em] ${muted}`}>
+                              {format(new Date(note.rangeStart), 'MMM d')}
+                              {note.rangeEnd !== note.rangeStart ? ` → ${format(new Date(note.rangeEnd), 'MMM d')}` : ''}
+                            </span>
+                          </div>
+                          <p className="mt-1 text-[11px] leading-snug line-clamp-2" style={{ color: cm.dot }}>{note.title}</p>
                         </div>
-                        <p className="mt-3 text-sm font-semibold" style={{ color: colorMeta.dot }}>
-                          {note.title}
-                        </p>
+                        <button onClick={() => deleteNote(note.id)}
+                          className="flex-shrink-0 rounded-full p-0.5 text-red-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+                          aria-label="Delete">
+                          <Trash2 size={10} />
+                        </button>
                       </div>
-                      <button
-                        onClick={() => deleteNote(note.id)}
-                        className="rounded-full p-1 text-red-400 transition-colors hover:bg-red-50 hover:text-red-500"
-                        aria-label="Delete note"
-                      >
-                        <Trash2 size={12} />
-                      </button>
-                    </div>
-                    <p className={`mt-3 text-sm leading-relaxed ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                      {note.content}
-                    </p>
-                  </motion.div>
-                );
-              })
-            ) : (
-              <div className={`rounded-[1.2rem] border border-dashed p-4 text-sm ${darkMode ? 'border-zinc-800 text-zinc-500' : 'border-black/10 text-zinc-500'}`}>
-                Your saved memories will appear here.
-              </div>
-            )}
-          </AnimatePresence>
-        </div>
+                      <p className={`mt-1 text-[11px] leading-snug line-clamp-2 ${darkMode ? 'text-zinc-300' : 'text-zinc-600'}`}>
+                        {note.content}
+                      </p>
+                    </motion.div>
+                  );
+                })
+              ) : (
+                <p className={`rounded-xl border border-dashed ${compact ? 'p-2.5 text-[10px]' : 'p-4 text-sm'} ${darkMode ? 'border-zinc-800 text-zinc-500' : 'border-black/10 text-zinc-400'}`}>
+                  Saved memories will appear here.
+                </p>
+              )}
+            </AnimatePresence>
+          </div>
+        </section>
       </div>
     </aside>
   );
