@@ -153,21 +153,21 @@ export default function NotesPanel({
         ))}
       </div>
 
-      {/* ── Tab content — page-flip from top, like a wall calendar tear-off ── */}
+      {/* ── Tab content — physical wall-calendar page flip ── */}
       <div
         className="flex-1 min-h-0 overflow-hidden relative"
-        style={{ perspective: '700px', perspectiveOrigin: 'top center' }}
+        style={{ perspective: '900px', perspectiveOrigin: 'top center' }}
       >
         <AnimatePresence mode="wait">
           <motion.div
             key={tab}
-            initial={{ rotateX: -72, opacity: 0, scale: 0.97 }}
-            animate={{ rotateX: 0,   opacity: 1, scale: 1    }}
-            exit={{    rotateX:  72, opacity: 0, scale: 0.97 }}
+            initial={{ rotateX: -90, opacity: 0, y: -6 }}
+            animate={{ rotateX:   0, opacity: 1, y:  0 }}
+            exit={{    rotateX:  90, opacity: 0, y: -4 }}
             transition={{
-              rotateX: { type: 'spring', stiffness: 260, damping: 28 },
-              opacity: { duration: 0.18 },
-              scale:   { duration: 0.22 },
+              rotateX: { type: 'spring', stiffness: 320, damping: 24, restDelta: 0.1 },
+              opacity: { duration: 0.08 },
+              y:       { type: 'spring', stiffness: 320, damping: 24 },
             }}
             style={{ transformOrigin: 'top center', transformStyle: 'preserve-3d' }}
             className="absolute inset-0 overflow-y-auto scrollbar-thin p-3 flex flex-col gap-3"

@@ -357,14 +357,22 @@ export default function WallCalendar() {
                     ))}
                   </div>
 
-                  <div className="flex-1 min-h-0 relative overflow-hidden">
+                  <div
+                    className="flex-1 min-h-0 relative overflow-hidden"
+                    style={{ perspective: '900px', perspectiveOrigin: 'top center' }}
+                  >
                     <AnimatePresence mode="wait">
                       <motion.div
                         key={mobileTab}
-                        initial={{ opacity: 0, x: mobileTab === 'calendar' ? -16 : 16 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.18 }}
+                        initial={{ rotateX: -90, opacity: 0, y: -6 }}
+                        animate={{ rotateX:   0, opacity: 1, y:  0 }}
+                        exit={{    rotateX:  90, opacity: 0, y: -4 }}
+                        transition={{
+                          rotateX: { type: 'spring', stiffness: 320, damping: 24, restDelta: 0.1 },
+                          opacity: { duration: 0.08 },
+                          y:       { type: 'spring', stiffness: 320, damping: 24 },
+                        }}
+                        style={{ transformOrigin: 'top center', transformStyle: 'preserve-3d' }}
                         className="absolute inset-0 flex flex-col"
                       >
                         {mobileTab === 'calendar' ? (
