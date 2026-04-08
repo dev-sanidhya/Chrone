@@ -110,90 +110,60 @@ export default function HeroPanel({
         </div>
       </div>
 
-      <div className="grid items-stretch gap-3 sm:grid-cols-[minmax(0,1.1fr)_minmax(200px,0.9fr)] sm:gap-3">
-        <GalleryPrint theme={theme} currentDate={currentDate} artifact={artifact} />
+      {/* ── Full-width illustration ── */}
+      <GalleryPrint theme={theme} currentDate={currentDate} artifact={artifact} />
 
-        <motion.aside
-          initial={{ opacity: 0, x: 8 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.28, delay: 0.06 }}
-          className={`flex flex-col gap-1.5 rounded-[1.2rem] border p-3 shadow-[0_12px_24px_rgba(15,23,42,0.1)] ${
-            darkMode ? 'border-zinc-800 bg-zinc-900/92' : 'border-black/10 bg-white/76'
-          }`}
-        >
-          {/* ── Title row ── */}
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-baseline gap-1.5 min-w-0">
-              <p className="text-[9px] font-bold uppercase tracking-[0.28em] text-zinc-400 flex-shrink-0">
-                Monthly Edition
-              </p>
-            </div>
-            <div
-              className="flex-shrink-0 rounded-full px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.14em] text-white"
+      {/* ── Compact info strip: month name | memo | holiday + progress ── */}
+      <div className="mt-2.5 flex items-start justify-between gap-3">
+        {/* Left: month + year + memory prompt */}
+        <div className="min-w-0 flex-1">
+          <div className="flex items-baseline gap-2">
+            <h1 className={`text-[1.45rem] font-black uppercase leading-none ${darkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
+              {format(currentDate, 'MMMM')}
+            </h1>
+            <span className={`text-xs font-semibold ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+              {format(currentDate, 'yyyy')}
+            </span>
+            <span
+              className="rounded-full px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.14em] text-white flex-shrink-0"
               style={{ backgroundColor: theme.primaryColor }}
             >
               {artifact.label}
-            </div>
+            </span>
           </div>
-
-          <h1 className="text-[1.55rem] font-black uppercase leading-none tracking-tight">
-            {format(currentDate, 'MMMM')}{' '}
-            <span className="text-sm font-semibold text-zinc-400">{format(currentDate, 'yyyy')}</span>
-          </h1>
-
           <p
-            className={`text-[11px] leading-snug line-clamp-2 ${darkMode ? 'text-zinc-400' : 'text-zinc-500'}`}
+            className={`mt-0.5 text-[10px] leading-snug line-clamp-1 ${darkMode ? 'text-zinc-400' : 'text-zinc-500'}`}
             style={{ fontFamily: 'var(--font-playfair), serif' }}
           >
-            {artifact.memoryPrompt}
+            {monthMemo.trim() ? `"${monthMemo}"` : artifact.memoryPrompt}
           </p>
+        </div>
 
-          {/* ── Month Memo + Next Marker side by side ── */}
-          <div className="grid grid-cols-2 gap-1.5 flex-1">
-            <div className={`rounded-lg border px-2 py-1.5 ${darkMode ? 'border-zinc-800 bg-zinc-950' : 'border-black/10 bg-[#faf7f1]'}`}>
-              <p className="text-[8px] font-bold uppercase tracking-[0.22em] text-zinc-400">Month Memo</p>
-              <p className={`mt-0.5 text-[11px] leading-snug line-clamp-2 ${darkMode ? 'text-zinc-300' : 'text-zinc-600'}`}>
-                {monthMemo.trim() ? monthMemo : 'Your handwritten margin for the month.'}
-              </p>
+        {/* Right: holiday countdown + progress */}
+        <div className="flex-shrink-0 text-right flex flex-col items-end gap-1">
+          {showHoliday && nextHoliday && (
+            <p className={`text-[10px] font-medium ${darkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
+              {nextHoliday.emoji} {diffDays === 0 ? 'Today!' : `${diffDays}d`}
+            </p>
+          )}
+          {isCurrentMonth && (
+            <div className="flex items-center gap-1.5">
+              <span className={`text-[9px] ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>{progressPct}%</span>
+              <div className="w-20 h-1 overflow-hidden rounded-full bg-black/8">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progressPct}%` }}
+                  transition={{ duration: 0.8, ease: 'easeOut' }}
+                  className="h-full rounded-full"
+                  style={{ backgroundColor: theme.primaryColor }}
+                />
+              </div>
             </div>
-            <div className={`rounded-lg border px-2 py-1.5 ${darkMode ? 'border-zinc-800 bg-zinc-950' : 'border-black/10 bg-[#faf7f1]'}`}>
-              <p className="text-[8px] font-bold uppercase tracking-[0.22em] text-zinc-400">Next Marker</p>
-              <p className={`mt-0.5 text-[11px] leading-snug line-clamp-2 ${darkMode ? 'text-zinc-300' : 'text-zinc-600'}`}>
-                {showHoliday && nextHoliday
-                  ? `${nextHoliday.emoji} ${nextHoliday.name}${diffDays === 0 ? ' today!' : ` in ${diffDays}d`}`
-                  : 'No nearby holiday. Open month.'}
-              </p>
-            </div>
-          </div>
-
-          {/* ── Progress bar ── */}
-          <div className="h-1 overflow-hidden rounded-full bg-black/8">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${progressPct}%` }}
-              transition={{ duration: 0.8, ease: 'easeOut' }}
-              className="h-full rounded-full"
-              style={{ backgroundColor: theme.primaryColor }}
-            />
-          </div>
-
-          {/* ── Feature tags ── */}
-          <div className="flex flex-wrap gap-1">
-            {[`${format(currentDate, 'MMM')} print`, 'page flip', 'memo', 'memory'].map((label) => (
-              <span
-                key={label}
-                className={`rounded-full px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-[0.1em] ${
-                  darkMode ? 'bg-zinc-800 text-zinc-400' : 'bg-stone-100 text-zinc-500'
-                }`}
-              >
-                {label}
-              </span>
-            ))}
-          </div>
-        </motion.aside>
+          )}
+        </div>
       </div>
 
-      <div className="relative mt-1.5 h-2">
+      <div className="relative mt-2 h-2">
         <div className="absolute inset-x-0 top-0.5 border-t border-dashed border-black/12" />
       </div>
     </section>
