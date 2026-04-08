@@ -104,10 +104,10 @@ export default function NotesPanel({
 
   return (
     <aside
-      className={`flex min-h-0 flex-col ${isMobile ? 'border-t' : 'border-r'} ${darkMode ? 'border-zinc-800' : 'border-black/5'} ${shell}`}
-      style={isMobile ? undefined : { width: 320, minWidth: 320, flexShrink: 0 }}
+      className={`flex-shrink-0 min-h-0 overflow-y-auto scrollbar-thin ${isMobile ? 'border-t' : 'border-r'} ${darkMode ? 'border-zinc-800' : 'border-black/5'} ${shell}`}
+      style={isMobile ? undefined : { width: 300, minWidth: 300 }}
     >
-      <div className={`grid gap-4 ${isMobile ? 'p-4' : 'p-5'}`}>
+      <div className={`grid gap-3 ${isMobile ? 'p-4' : 'p-4'}`}>
         <section className={`rounded-[1.7rem] border p-4 shadow-[0_20px_32px_rgba(15,23,42,0.08)] ${card}`}>
           <div className="flex items-center justify-between">
             <p className={`text-[10px] font-black uppercase tracking-[0.32em] ${muted}`}>Month Memo</p>

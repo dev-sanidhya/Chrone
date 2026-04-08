@@ -199,7 +199,7 @@ export default function WallCalendar() {
 
   return (
     <div
-      className={`min-h-screen flex items-start justify-center transition-colors duration-500 ${outerBg} p-0 md:p-6`}
+      className={`h-screen overflow-hidden flex items-center justify-center transition-colors duration-500 ${outerBg} p-0 md:p-4`}
       style={{ '--theme-primary': theme.primaryColor } as React.CSSProperties}
     >
       <Confetti trigger={confettiTrigger} />
@@ -284,9 +284,9 @@ export default function WallCalendar() {
         )}
       </AnimatePresence>
 
-      <div className="mx-auto flex w-full max-w-[1180px] items-start justify-center">
+      <div className="mx-auto flex w-full max-w-[1180px] h-full max-h-[calc(100vh-2rem)] items-center justify-center">
         <div
-          className="w-full max-w-full"
+          className="w-full h-full"
           style={{
             perspective: '1500px',
             perspectiveOrigin: 'center center',
@@ -302,10 +302,10 @@ export default function WallCalendar() {
               exit="exit"
               transition={{ duration: 0.36, ease: [0.25, 0.46, 0.45, 0.94] }}
               style={{ transformStyle: 'preserve-3d', transformOrigin: 'center top' }}
-              className="w-full"
+              className="w-full h-full"
             >
               <div
-                className={`calendar-card flex w-full max-w-full flex-col overflow-visible rounded-none sm:rounded-[2rem] paper-texture ${darkMode ? 'bg-zinc-900' : 'bg-[#fdf9f1]'}`}
+                className={`calendar-card flex flex-col w-full h-full overflow-hidden rounded-none sm:rounded-[2rem] paper-texture ${darkMode ? 'bg-zinc-900' : 'bg-[#fdf9f1]'}`}
                 style={{ boxShadow: cardShadow }}
               >
                 <BindingRings primaryColor={theme.primaryColor} />
@@ -319,7 +319,7 @@ export default function WallCalendar() {
                   onOpenYearView={() => setShowYearView(true)}
                 />
 
-                <div className="hidden sm:flex" style={{ minHeight: 420 }}>
+                <div className="flex-1 min-h-0 hidden sm:flex overflow-hidden">
                   <NotesPanel
                     currentDate={currentDate}
                     selectedRange={selectedRange}

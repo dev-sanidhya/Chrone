@@ -73,8 +73,8 @@ export default function CalendarGrid({
   const hoverBg  = darkMode ? 'hover:bg-zinc-700' : 'hover:bg-zinc-100';
 
   return (
-    <div className={`relative flex flex-col flex-1 overflow-hidden transition-colors duration-300 ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
-      <div className={`flex flex-col gap-2 flex-1 ${isMobile ? 'p-3' : 'p-3'}`}>
+    <div className={`relative flex flex-col flex-1 min-h-0 overflow-hidden transition-colors duration-300 ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
+      <div className={`flex flex-col gap-1.5 h-full ${isMobile ? 'p-3' : 'p-3'}`}>
 
         {/* ── Month navigation ── */}
         <div className="flex items-center justify-between">
@@ -161,7 +161,7 @@ export default function CalendarGrid({
         </div>
 
         {/* ── Date grid ── */}
-        <div className="relative flex-1">
+        <div className="relative flex-1 min-h-0">
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={format(currentDate, 'yyyy-MM')}
@@ -173,7 +173,8 @@ export default function CalendarGrid({
               }}
               initial="enter" animate="center" exit="exit"
               transition={{ type:'spring', stiffness:340, damping:34 }}
-              className="grid grid-cols-7"
+              className="absolute inset-0 grid grid-cols-7"
+              style={{ gridAutoRows: '1fr' }}
             >
               {calDays.map((date, idx) => {
                 const holiday  = getHolidayForDate(date.getMonth(), date.getDate());

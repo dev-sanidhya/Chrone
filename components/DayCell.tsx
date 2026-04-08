@@ -41,8 +41,7 @@ export default function DayCell({
 
   return (
     <div
-      className="relative flex items-center justify-center"
-      style={{ height: isMobile ? 42 : 38 }}
+      className="relative flex items-center justify-center h-full"
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
       onTouchStart={onHover}

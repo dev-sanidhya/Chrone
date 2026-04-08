@@ -15,7 +15,7 @@ interface GalleryPrintProps {
 
 export default function GalleryPrint({ theme, currentDate, artifact }: GalleryPrintProps) {
   return (
-    <div className="relative min-h-[270px] sm:min-h-[360px] lg:h-full">
+    <div className="relative h-full min-h-[160px]">
       <div className="absolute -left-1 top-3 h-12 w-8 rotate-[-8deg] rounded-sm bg-stone-100/90 shadow-[0_12px_22px_rgba(0,0,0,0.14)] sm:h-14 sm:w-10" />
       <div className="absolute right-4 top-0 h-10 w-16 rotate-[6deg] rounded-sm bg-stone-100/75 shadow-[0_12px_22px_rgba(0,0,0,0.12)] sm:right-7 sm:h-12 sm:w-20" />
 

@@ -60,7 +60,7 @@ export default function HeroPanel({
 
   return (
     <section
-      className={`relative overflow-hidden px-3 pb-5 pt-5 sm:px-6 sm:pb-8 lg:px-8 ${
+      className={`relative flex-shrink-0 overflow-hidden px-3 pb-3 pt-3 sm:px-5 sm:pb-4 sm:pt-4 ${
         darkMode ? 'bg-zinc-950 text-zinc-100' : 'bg-[#efe7db] text-zinc-900'
       }`}
     >
@@ -73,7 +73,7 @@ export default function HeroPanel({
         }}
       />
 
-      <div className="relative mb-4 flex items-center justify-between gap-3 sm:mb-6 sm:gap-4">
+      <div className="relative mb-2 flex items-center justify-between gap-2 sm:mb-3 sm:gap-3">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white/70 text-lg shadow-[0_8px_16px_rgba(15,23,42,0.12)] sm:h-12 sm:w-12 sm:text-xl">
             {theme.emoji}
@@ -112,14 +112,14 @@ export default function HeroPanel({
         </div>
       </div>
 
-      <div className="grid items-start gap-4 sm:gap-6 lg:grid-cols-[minmax(0,1.28fr)_minmax(300px,0.72fr)] lg:gap-8">
+      <div className="grid items-start gap-3 sm:grid-cols-[minmax(0,1.1fr)_minmax(220px,0.9fr)] sm:gap-4">
         <GalleryPrint theme={theme} currentDate={currentDate} artifact={artifact} />
 
         <motion.aside
           initial={{ opacity: 0, x: 8 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.28, delay: 0.06 }}
-          className={`flex flex-col rounded-[1.6rem] border p-4 shadow-[0_24px_48px_rgba(15,23,42,0.14)] sm:rounded-[2rem] sm:p-5 ${
+          className={`flex flex-col rounded-[1.4rem] border p-3 shadow-[0_16px_32px_rgba(15,23,42,0.12)] sm:rounded-[1.8rem] sm:p-4 ${
             darkMode ? 'border-zinc-800 bg-zinc-900/92' : 'border-black/10 bg-white/76'
           }`}
         >
@@ -128,10 +128,10 @@ export default function HeroPanel({
               <p className="text-[10px] font-bold uppercase tracking-[0.34em] text-zinc-500">
                 Monthly Edition
               </p>
-              <h1 className="mt-2 text-[2.4rem] font-black uppercase leading-none sm:text-5xl">
+              <h1 className="mt-1.5 text-[1.9rem] font-black uppercase leading-none sm:text-[2.4rem]">
                 {format(currentDate, 'MMMM')}
               </h1>
-              <p className="mt-1.5 text-[13px] text-zinc-500 sm:mt-2 sm:text-sm">{format(currentDate, 'yyyy')}</p>
+              <p className="mt-1 text-[12px] text-zinc-500">{format(currentDate, 'yyyy')}</p>
             </div>
             <div
               className="rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.2em] text-white sm:px-3 sm:text-[10px] sm:tracking-[0.26em]"
@@ -142,14 +142,14 @@ export default function HeroPanel({
           </div>
 
           <p
-            className={`mt-4 text-[15px] leading-relaxed sm:mt-5 sm:text-base ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}
+            className={`mt-2 text-[13px] leading-snug sm:text-sm ${darkMode ? 'text-zinc-300' : 'text-zinc-700'}`}
             style={{ fontFamily: 'var(--font-playfair), serif' }}
           >
             {artifact.memoryPrompt}
           </p>
 
           <div
-            className={`mt-4 rounded-2xl border px-4 py-3 sm:mt-5 ${
+            className={`mt-2 rounded-xl border px-3 py-2 sm:mt-3 ${
               darkMode ? 'border-zinc-800 bg-zinc-950' : 'border-black/10 bg-[#faf7f1]'
             }`}
           >
@@ -164,7 +164,7 @@ export default function HeroPanel({
           </div>
 
           <div
-            className={`mt-3 rounded-2xl border px-4 py-3 sm:mt-4 ${
+            className={`mt-2 rounded-xl border px-3 py-2 ${
               darkMode ? 'border-zinc-800 bg-zinc-950' : 'border-black/10 bg-[#faf7f1]'
             }`}
           >
@@ -178,8 +178,8 @@ export default function HeroPanel({
             </p>
           </div>
 
-          <div className="mt-4 sm:mt-5">
-            <div className="h-2 overflow-hidden rounded-full bg-black/8">
+          <div className="mt-2">
+            <div className="h-1.5 overflow-hidden rounded-full bg-black/8">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPct}%` }}
@@ -189,7 +189,7 @@ export default function HeroPanel({
               />
             </div>
 
-            <div className="mt-3 flex flex-wrap gap-2 sm:mt-4">
+            <div className="mt-2 flex flex-wrap gap-1.5">
               {[
                 `${format(currentDate, 'MMMM')} print`,
                 'tear-off page flip',
@@ -198,7 +198,7 @@ export default function HeroPanel({
               ].map((label) => (
                 <span
                   key={label}
-                  className={`rounded-full px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] sm:px-3 sm:text-[10px] sm:tracking-[0.18em] ${
+                  className={`rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.12em] ${
                     darkMode ? 'bg-zinc-800 text-zinc-300' : 'bg-stone-100 text-zinc-600'
                   }`}
                 >
@@ -210,8 +210,8 @@ export default function HeroPanel({
         </motion.aside>
       </div>
 
-      <div className="relative mt-5 h-5 sm:mt-6">
-        <div className="absolute inset-x-0 top-2 border-t border-dashed border-black/15" />
+      <div className="relative mt-2 h-3">
+        <div className="absolute inset-x-0 top-1 border-t border-dashed border-black/15" />
       </div>
     </section>
   );
