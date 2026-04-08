@@ -15,7 +15,7 @@ interface GalleryPrintProps {
 
 export default function GalleryPrint({ theme, currentDate, artifact }: GalleryPrintProps) {
   return (
-    <div className="relative" style={{ height: 172 }}>
+    <div className="relative" style={{ height: 'clamp(130px, 22vw, 172px)' }}>
       {/* Decorative paper sheets behind the card */}
       <div className="absolute -left-1 top-2 h-8 w-6 rotate-[-8deg] rounded-sm bg-stone-100/90 shadow-[0_8px_14px_rgba(0,0,0,0.12)]" />
       <div className="absolute right-3 top-0 h-7 w-12 rotate-[6deg] rounded-sm bg-stone-100/75 shadow-[0_8px_14px_rgba(0,0,0,0.1)]" />

@@ -334,8 +334,8 @@ export default function WallCalendar() {
                   <CalendarGrid {...calendarGridProps} />
                 </div>
 
-                <div className="flex flex-col sm:hidden">
-                  <div className={`flex border-b ${darkMode ? 'border-zinc-800' : 'border-zinc-100'}`}>
+                <div className="flex-1 min-h-0 flex flex-col overflow-hidden sm:hidden">
+                  <div className={`flex border-b flex-shrink-0 ${darkMode ? 'border-zinc-800' : 'border-zinc-100'}`}>
                     {(['calendar', 'notes'] as const).map((tab) => (
                       <button
                         key={tab}
@@ -357,32 +357,35 @@ export default function WallCalendar() {
                     ))}
                   </div>
 
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={mobileTab}
-                      initial={{ opacity: 0, x: mobileTab === 'calendar' ? -16 : 16 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.18 }}
-                    >
-                      {mobileTab === 'calendar' ? (
-                        <CalendarGrid {...calendarGridProps} isMobile />
-                      ) : (
-                        <NotesPanel
-                          currentDate={currentDate}
-                          selectedRange={selectedRange}
-                          notes={notes}
-                          monthMemo={monthMemo}
-                          onSaveMonthMemo={persistMonthMemo}
-                          onSaveNotes={persistNotes}
-                          onClearSelection={clearSelection}
-                          theme={theme}
-                          darkMode={darkMode}
-                          isMobile
-                        />
-                      )}
-                    </motion.div>
-                  </AnimatePresence>
+                  <div className="flex-1 min-h-0 relative overflow-hidden">
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={mobileTab}
+                        initial={{ opacity: 0, x: mobileTab === 'calendar' ? -16 : 16 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.18 }}
+                        className="absolute inset-0 flex flex-col"
+                      >
+                        {mobileTab === 'calendar' ? (
+                          <CalendarGrid {...calendarGridProps} isMobile />
+                        ) : (
+                          <NotesPanel
+                            currentDate={currentDate}
+                            selectedRange={selectedRange}
+                            notes={notes}
+                            monthMemo={monthMemo}
+                            onSaveMonthMemo={persistMonthMemo}
+                            onSaveNotes={persistNotes}
+                            onClearSelection={clearSelection}
+                            theme={theme}
+                            darkMode={darkMode}
+                            isMobile
+                          />
+                        )}
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
                 </div>
               </div>
             </motion.div>

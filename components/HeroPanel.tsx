@@ -60,7 +60,7 @@ export default function HeroPanel({
 
   return (
     <section
-      className={`relative flex-shrink-0 overflow-hidden px-3 pb-3 pt-3 sm:px-5 sm:pb-4 sm:pt-4 ${
+      className={`relative flex-shrink-0 overflow-hidden px-3 pb-2.5 pt-2 sm:px-5 sm:pb-4 sm:pt-4 ${
         darkMode ? 'bg-zinc-950 text-zinc-100' : 'bg-[#efe7db] text-zinc-900'
       }`}
     >
@@ -73,7 +73,7 @@ export default function HeroPanel({
         }}
       />
 
-      <div className="relative mb-2 flex items-center justify-between gap-2">
+      <div className="relative mb-1.5 flex items-center justify-between gap-2">
         <div className="flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-full border border-black/10 bg-white/70 text-base shadow-[0_4px_10px_rgba(15,23,42,0.1)]">
             {theme.emoji}
@@ -118,7 +118,7 @@ export default function HeroPanel({
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
-        className={`relative mt-2.5 overflow-hidden rounded-2xl border ${
+        className={`relative mt-1.5 sm:mt-2.5 overflow-hidden rounded-2xl border ${
           darkMode
             ? 'border-zinc-700/60 bg-zinc-800/70'
             : 'border-black/6 bg-white/90'
@@ -136,7 +136,7 @@ export default function HeroPanel({
           style={{ backgroundColor: theme.primaryColor }}
         />
 
-        <div className="flex items-center justify-between gap-3 pl-4 pr-3 pt-2.5 pb-1.5">
+        <div className="flex items-center justify-between gap-3 pl-4 pr-3 pt-1.5 pb-1 sm:pt-2.5 sm:pb-1.5">
           {/* Left: month name + year + season badge */}
           <div className="flex items-center gap-2 min-w-0 flex-1 flex-wrap">
             <h1
@@ -195,7 +195,7 @@ export default function HeroPanel({
 
         {/* Memory prompt / month memo italic line */}
         <p
-          className={`pl-4 pr-3 pb-2 text-[10px] italic leading-snug line-clamp-1 ${
+          className={`pl-4 pr-3 pb-1.5 text-[10px] italic leading-snug line-clamp-1 ${
             darkMode ? 'text-zinc-400' : 'text-zinc-500'
           }`}
           style={{ fontFamily: 'var(--font-playfair), serif' }}

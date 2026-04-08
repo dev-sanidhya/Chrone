@@ -117,7 +117,7 @@ export default function NotesPanel({
 
   return (
     <aside
-      className={`flex-shrink-0 flex flex-col min-h-0 border-r ${darkMode ? 'border-zinc-800' : 'border-black/5'} ${shell}`}
+      className={`flex flex-col min-h-0 overflow-hidden border-r ${darkMode ? 'border-zinc-800' : 'border-black/5'} ${shell} ${isMobile ? 'flex-1' : 'flex-shrink-0'}`}
       style={isMobile ? undefined : { width: 292, minWidth: 292 }}
     >
       {/* ── Tab bar — mimics the ruled edge just below the binding rings ── */}
