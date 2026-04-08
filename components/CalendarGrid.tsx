@@ -76,15 +76,19 @@ export default function CalendarGrid({
     <div className={`relative flex flex-col flex-1 min-h-0 overflow-hidden transition-colors duration-300 ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
       <div className={`flex flex-col gap-1.5 h-full ${isMobile ? 'p-3' : 'p-3'}`}>
 
-        {/* ── Month navigation ── */}
-        <div className="flex items-center justify-between">
-          <button onClick={onPrevMonth}
-            className={`p-2 rounded-xl ${hoverBg} transition-all hover:scale-105 active:scale-95 touch-manipulation ${dimText}`}
-            aria-label="Previous month">
-            <ChevronLeft size={isMobile ? 18 : 16}/>
+        {/* ── Month navigation (Today + prev/month/next + Wk) ── */}
+        <div className="flex items-center gap-1">
+          {/* Today button — lives here, never overlaps dates */}
+          <button
+            onClick={onGoToToday}
+            className={`flex items-center gap-1 font-semibold rounded-lg transition-all hover:scale-105 active:scale-95 touch-manipulation flex-shrink-0 ${isMobile ? 'px-2 py-1 text-[9px]' : 'px-2 py-1 text-[9px]'}`}
+            style={{ color: theme.primaryColor, backgroundColor: `${theme.primaryColor}15` }}
+          >
+            <RotateCcw size={9}/> Today
           </button>
 
-          <div className="text-center flex-1">
+          {/* Month + year centred */}
+          <div className="text-center flex-1 min-w-0">
             <AnimatePresence mode="wait" custom={direction}>
               <motion.p
                 key={format(currentDate, 'yyyy-MM')}
@@ -101,28 +105,41 @@ export default function CalendarGrid({
                 {format(currentDate, 'MMMM yyyy')}
               </motion.p>
             </AnimatePresence>
-            <p className={`text-[9px] ${dimText}`}>
-              {selectionStep === 'end' ? '→ pick end date' :
-               selectionStep === 'start' && !selectedRange.start ? 'Tap a date to begin' : ''}
-            </p>
           </div>
 
-          <button onClick={onNextMonth}
-            className={`p-2 rounded-xl ${hoverBg} transition-all hover:scale-105 active:scale-95 touch-manipulation ${dimText}`}
-            aria-label="Next month">
-            <ChevronRight size={isMobile ? 18 : 16}/>
+          {/* Prev / Next */}
+          <button onClick={onPrevMonth}
+            className={`p-1.5 rounded-lg ${hoverBg} transition-all hover:scale-105 active:scale-95 touch-manipulation ${dimText}`}
+            aria-label="Previous month">
+            <ChevronLeft size={14}/>
           </button>
+          <button onClick={onNextMonth}
+            className={`p-1.5 rounded-lg ${hoverBg} transition-all hover:scale-105 active:scale-95 touch-manipulation ${dimText}`}
+            aria-label="Next month">
+            <ChevronRight size={14}/>
+          </button>
+
+          {/* Week number */}
+          <span className={`font-mono text-[9px] flex-shrink-0 ${dimText}`}>
+            Wk {getISOWeek(currentDate)}
+          </span>
         </div>
 
-        {/* ── Month stats ── */}
-        <div className={`flex flex-wrap items-center gap-2 ${isMobile ? 'text-[10px]' : 'text-[10px]'} font-medium ${dimText}`}>
-          <span>{totalDays} days</span>
-          <span className="opacity-40">·</span>
-          <span>{weekendDays} weekend</span>
-          {holidays > 0 && <>
+        {/* ── Stats + hint (one compact row) ── */}
+        <div className="flex items-center justify-between">
+          <div className={`flex items-center gap-1.5 text-[9px] font-medium ${dimText}`}>
+            <span>{totalDays}d</span>
             <span className="opacity-40">·</span>
-            <span>{holidays} holiday{holidays!==1?'s':''}</span>
-          </>}
+            <span>{weekendDays} wknd</span>
+            {holidays > 0 && <>
+              <span className="opacity-40">·</span>
+              <span>{holidays} hol</span>
+            </>}
+            {selectionStep === 'end' && (
+              <span className="font-semibold" style={{ color: theme.primaryColor }}>→ pick end</span>
+            )}
+          </div>
+          <p className={`text-[8px] ${dimText}`}>double-tap to sticker</p>
         </div>
 
         {/* ── Selection pill ── */}
@@ -205,24 +222,6 @@ export default function CalendarGrid({
           </AnimatePresence>
         </div>
 
-        {/* ── Footer ── */}
-        <div className="flex items-center justify-between pt-1">
-          <button
-            onClick={onGoToToday}
-            className={`flex items-center gap-1 font-semibold rounded-lg transition-all hover:scale-105 active:scale-95 touch-manipulation ${isMobile ? 'px-2 py-1.5 text-[9px]' : 'px-2.5 py-1.5 text-[10px]'}`}
-            style={{ color: theme.primaryColor, backgroundColor: `${theme.primaryColor}15` }}
-          >
-            <RotateCcw size={10}/> Today
-          </button>
-          <span className={`font-mono ${isMobile ? 'text-[8px]' : 'text-[9px]'} ${dimText}`}>
-            Wk {getISOWeek(currentDate)}
-          </span>
-        </div>
-
-        {/* ── Double-tap hint ── */}
-        <p className={`text-center ${isMobile ? 'text-[7px]' : 'text-[8px]'} ${dimText} mt-0`}>
-          Double-tap a date to pin a sticker
-        </p>
       </div>
     </div>
   );
